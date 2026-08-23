@@ -4,6 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anexos - Sistema</title>
+
+    <!-- CONFIGURAÇÕES DE PWA E ÍCONES -->
+    <meta name="theme-color" content="#030712">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Anexos">
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <!-- GERADOR DE MANIFEST DINÂMICO PARA PWA COM ICON.PNG -->
+    <script>
+        (function() {
+            const manifest = {
+                name: "Sistema de Anexos",
+                short_name: "Anexos",
+                description: "Gestão e Escaneamento de Anexos e Documentos",
+                start_url: "./",
+                display: "standalone",
+                background_color: "#030712",
+                theme_color: "#030712",
+                orientation: "portrait",
+                icons: [
+                    {
+                        src: "icon.png",
+                        sizes: "192x192",
+                        type: "image/png",
+                        purpose: "any maskable"
+                    },
+                    {
+                        src: "icon.png",
+                        sizes: "512x512",
+                        type: "image/png",
+                        purpose: "any maskable"
+                    }
+                ]
+            };
+            const stringManifest = JSON.stringify(manifest);
+            const blob = new Blob([stringManifest], {type: 'application/json'});
+            const manifestUrl = URL.createObjectURL(blob);
+            const link = document.createElement('link');
+            link.rel = 'manifest';
+            link.href = manifestUrl;
+            document.head.appendChild(link);
+        })();
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -166,10 +213,8 @@
                 </div>
             </div>
 
-            <!-- Preview Visual Dinâmico -->
             <div class="w-full h-64 sm:h-80 bg-gray-950 rounded-lg border border-gray-800 flex items-center justify-center overflow-hidden relative shadow-inner">
                 <img id="imagemEmDestaque" src="" class="max-w-full max-h-full object-contain hidden">
-                
                 <iframe id="iframePreview" src="" class="w-full h-full hidden bg-white rounded-lg"></iframe>
 
                 <div id="iconeDestaque" class="hidden flex-col items-center justify-center gap-3 text-gray-500">
@@ -217,7 +262,7 @@
                 
                 <input type="file" id="inputArquivoGenerico" class="hidden" accept="*/*" multiple onchange="processarArquivosLote(this, 'generico')">
 
-                <!-- PREVIEW FILA DIVERSA -->
+                <!-- PREVIEW UNIFICADO DE FILA DIVERSA -->
                 <div id="areaPreviewArquivos" class="hidden flex-col gap-3 mt-2">
                     <div class="flex justify-between items-center border-b border-gray-800 pb-2">
                         <span class="text-xs font-bold text-blue-400"><i class="fas fa-layer-group"></i> Fila de Envio</span>
@@ -444,7 +489,7 @@
         import { getDatabase, ref as dbRef, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
         import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
-        // CREDENCIAIS ATUALIZADAS DO FIREBASE (PROJETO: anexos-2)
+        // CREDENCIAIS DO PROJETO FIREBASE anexos-2
         const firebaseConfig = {
             apiKey: "AIzaSyCQ8--X39oK3BnwNES7zDklKnWP0_4hEas",
             authDomain: "anexos-2.firebaseapp.com",
@@ -1049,6 +1094,7 @@
             window.renderizarFiltroAtual(true);
         };
 
+        // SALVAR PÁGINA ESCANEADA SEM BORDAS/MOLDURAS NO DATAURL FINAL
         window.confirmarSalvarPaginaScanner = function() {
             window.renderizarFiltroAtual(false);
             const canvasLive = document.getElementById("canvasLivePreview");
@@ -1171,6 +1217,7 @@
             window.renderizarListaFilaEnvio();
         };
 
+        // GERAÇÃO DE PDF COMPATÍVEL COM STRINGS OU OBJETOS DE ESTADO
         window.iniciarUploadStorage = function() {
             let nomeDigitado = document.getElementById("nomeArquivoManual").value.trim();
             if (!nomeDigitado) return alert("⚠️ Digite um nome ou descrição para a remessa!");
@@ -1193,7 +1240,6 @@
                     const pdfHeight = doc.internal.pageSize.getHeight();
 
                     arrayPaginasEscaneadas.forEach((pagData, i) => {
-                        // Trata objetos de estado ou strings base64
                         let imgBase64 = typeof pagData === 'string' ? pagData : pagData.finalDataUrl;
                         if (i > 0) doc.addPage();
                         const imgProps = doc.getImageProperties(imgBase64);
@@ -1493,7 +1539,7 @@
                 else { elIconeFa.className = "fas fa-file-alt text-6xl text-purple-500"; } 
             }
             
-            window.cancelarEdicaoNome();
+            cancelarEdicaoNome();
             const modal = document.getElementById("modalVisualizacao"); const content = document.getElementById("modalVisualizacaoContent");
             modal.classList.remove("hidden"); modal.classList.add("flex");
             setTimeout(() => { content.classList.remove("scale-95", "opacity-0"); content.classList.add("scale-100", "opacity-100"); }, 10);
@@ -1527,11 +1573,11 @@
             const nomeArquivo = document.getElementById("tituloImagemCard").innerText;
             if (!confirm(`⚠️ Tem certeza de que deseja excluir o anexo "${nomeArquivo}"?`)) return;
             if (perfilUsuario === "administrador") {
-                remove(dbRef(db, 'arquivos_anexos/' + window.idImagemAtiva)).then(() => { window.fecharModalVisualizacao(); }).catch(err => alert("Erro ao excluir: " + err.message));
+                remove(dbRef(db, 'arquivos_anexos/' + window.idImagemAtiva)).then(() => { fecharModalVisualizacao(); }).catch(err => alert("Erro ao excluir: " + err.message));
             } else {
                 update(dbRef(db, 'arquivos_anexos/' + window.idImagemAtiva), { statusExclusao: "pendente_aprovacao", solicitadoPor: usuarioLogado }).then(() => {
                     push(dbRef(db, 'notificacoes_sistema'), { titulo: "Solicitação de Exclusão de Anexo", mensagem: `O usuário @${usuarioLogado} solicitou a exclusão do anexo "${nomeArquivo}".`, tipo: "alerta", usuarioSolicitante: usuarioLogado, enviadoPorUid: uidUsuarioLogado, idAnexo: window.idImagemAtiva, timestamp: Date.now(), data: Date.now() });
-                    window.fecharModalVisualizacao();
+                    fecharModalVisualizacao();
                 }).catch(err => alert("Erro ao processar: " + err.message));
             }
         };
@@ -1542,7 +1588,7 @@
             const novoNome = document.getElementById("inputEdicaoNome").value.trim();
             if (!novoNome) return alert("⚠️ Digite um nome válido!");
             const btnSalvar = document.getElementById("btnSalvarEdicao"); btnSalvar.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Salvando...`; btnSalvar.disabled = true;
-            update(dbRef(db, 'arquivos_anexos/' + window.idImagemAtiva), { nome: novoNome }).then(() => { document.getElementById("tituloImagemCard").innerText = novoNome; window.cancelarEdicaoNome(); btnSalvar.innerHTML = `<i class="fas fa-save"></i> Salvar`; btnSalvar.disabled = false; }).catch(erro => { alert("Erro ao salvar o nome: " + erro.message); btnSalvar.innerHTML = `<i class="fas fa-save"></i> Salvar`; btnSalvar.disabled = false; });
+            update(dbRef(db, 'arquivos_anexos/' + window.idImagemAtiva), { nome: novoNome }).then(() => { document.getElementById("tituloImagemCard").innerText = novoNome; cancelarEdicaoNome(); btnSalvar.innerHTML = `<i class="fas fa-save"></i> Salvar`; btnSalvar.disabled = false; }).catch(erro => { alert("Erro ao salvar o nome: " + erro.message); btnSalvar.innerHTML = `<i class="fas fa-save"></i> Salvar`; btnSalvar.disabled = false; });
         };
 
         window.abrirModalNotificacoes = function() { const modal = document.getElementById("modalNotificacoes"); const content = document.getElementById("modalNotificacoesContent"); modal.classList.remove("hidden"); modal.classList.add("flex"); setTimeout(() => { content.classList.remove("scale-95", "opacity-0"); content.classList.add("scale-100", "opacity-100"); }, 10); };
@@ -1593,7 +1639,7 @@
             }
         });
 
-        // DISPARADORES SEGUROS PARA EVENTOS
+        // DISPARADORES SEGUROS CONTRA NULL
         document.getElementById("inputBuscaAnexo")?.addEventListener("input", window.aplicarFiltrosNaGaleria);
         document.getElementById("dataInicioFiltro")?.addEventListener("change", window.aplicarFiltrosNaGaleria);
         document.getElementById("dataFimFiltro")?.addEventListener("change", window.aplicarFiltrosNaGaleria);
