@@ -559,13 +559,14 @@
         </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL E FIREBASE COM BUSCA RESTRITA POR USERNAME -->
+    <!-- SCRIPT PRINCIPAL E FIREBASE COM AUTENTICAÇÃO RESTRITA POR USERNAME -->
     <script type="module">
         import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getDatabase, ref as dbRef, push, onValue, update, remove, set, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
         import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
+        // CREDENCIAIS DO FIREBASE (PROJETO: anexos-2)
         const firebaseConfig = {
             apiKey: "AIzaSyCQ8--X39oK3BnwNES7zDklKnWP0_4hEas",
             authDomain: "anexos-2.firebaseapp.com",
