@@ -115,7 +115,7 @@
 </head>
 <body class="bg-gray-950 text-gray-100 font-sans min-h-screen flex flex-col relative pb-24">
 
-    <!-- MODAL DE LOGIN EMBUTIDO (OBRIGATÓRIO PARA ENTRAR) -->
+    <!-- MODAL DE LOGIN EMBUTIDO -->
     <div id="modalLoginApp" class="fixed inset-0 bg-black/95 popup-blur z-[100] flex items-center justify-center p-4">
         <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-sm shadow-2xl flex flex-col gap-4">
             <div class="text-center flex flex-col items-center gap-2">
@@ -128,7 +128,7 @@
 
             <form id="formLogin" onsubmit="window.executarLoginFirebase(event)" class="flex flex-col gap-3">
                 <div class="flex flex-col gap-1">
-                    <label class="text-[10px] text-gray-400 font-bold uppercase">Usuário</label>
+                    <label class="text-[10px] text-gray-400 font-bold uppercase">Usuário ou E-mail</label>
                     <input type="text" id="loginUsuario" required placeholder="Digite seu usuário..." class="p-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-xs focus:outline-none focus:border-blue-500">
                 </div>
                 <div class="flex flex-col gap-1">
@@ -144,17 +144,17 @@
         </div>
     </div>
 
-    <!-- POP-UP DE RECUPERAÇÃO DE SENHA (PEDE O USUÁRIO E BUSCA O E-MAIL AUTOMATICAMENTE) -->
+    <!-- POP-UP DE RECUPERAÇÃO DE SENHA -->
     <div id="modalRecuperarSenha" class="fixed inset-0 bg-black/90 popup-blur hidden items-center justify-center p-4 z-[110]">
         <div class="bg-gray-900 rounded-2xl border border-gray-800 p-5 w-full max-w-xs shadow-2xl flex flex-col gap-4 text-center">
             <div class="w-10 h-10 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center mx-auto text-lg border border-yellow-500/30">
                 <i class="fas fa-key"></i>
             </div>
             <h3 class="text-sm font-bold text-white">Recuperar Senha</h3>
-            <p class="text-xs text-gray-400">Digite seu nome de usuário. O sistema localizará seu e-mail cadastrado e enviará o link de redefinição.</p>
+            <p class="text-xs text-gray-400">Digite seu nome de usuário ou e-mail cadastrado para receber o link de redefinição.</p>
             
             <form onsubmit="window.confirmarRecuperacaoSenha(event)" class="flex flex-col gap-3">
-                <input type="text" id="recUsuario" required placeholder="Digite o nome de usuário..." class="p-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-xs focus:outline-none focus:border-blue-500">
+                <input type="text" id="recUsuario" required placeholder="Digite o usuário ou e-mail..." class="p-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-xs focus:outline-none focus:border-blue-500">
                 <div class="flex gap-2">
                     <button type="button" onclick="window.fecharModalRecuperarSenha()" class="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 py-2.5 rounded-xl text-xs font-bold border border-gray-700 transition">Cancelar</button>
                     <button type="submit" id="btnEnviarRecuperacao" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-2.5 rounded-xl text-xs font-bold transition">Enviar Link</button>
@@ -163,7 +163,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE CADASTRO DE NOVO USUÁRIO (ACESSÍVEL APENAS PELO ADM NO MENU LATERAL) -->
+    <!-- MODAL DE CADASTRO DE NOVO USUÁRIO -->
     <div id="modalCadastroUsuario" class="fixed inset-0 bg-black/90 popup-blur hidden items-center justify-center p-4 z-[90]">
         <div class="bg-gray-900 rounded-2xl border border-gray-800 p-6 w-full max-w-sm shadow-2xl flex flex-col gap-4">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
@@ -177,7 +177,7 @@
                     <input type="text" id="cadUsuario" required placeholder="Ex: joao_silva" class="p-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-xs focus:outline-none focus:border-blue-500">
                 </div>
                 <div class="flex flex-col gap-1">
-                    <label class="text-[10px] text-gray-400 font-bold uppercase">E-mail</label>
+                    <label class="text-[10px] text-gray-400 font-bold uppercase">E-mail Real</label>
                     <input type="email" id="cadEmail" required placeholder="joao@email.com" class="p-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-xs focus:outline-none focus:border-blue-500">
                 </div>
                 <div class="flex flex-col gap-1">
@@ -217,7 +217,6 @@
         </div>
         
         <div class="p-4 flex flex-col gap-2 flex-1">
-            <!-- BOTÃO DE CADASTRAR NOVO USUÁRIO EXCLUSIVO DO ADMINISTRADOR -->
             <button id="btnSidebarCadastrarUsuario" onclick="window.abrirModalCadastroUsuario()" class="hidden w-full bg-blue-900/40 hover:bg-blue-800/60 border border-blue-700/60 text-blue-300 p-3 rounded-xl font-bold text-xs transition flex items-center gap-2.5">
                 <i class="fas fa-user-plus text-blue-400"></i> Cadastrar Novo Usuário
             </button>
@@ -621,7 +620,7 @@
             if (el) el.addEventListener(evento, callback);
         }
 
-        // LÓGICA DE LOGIN EXCLUSIVO VIA FIREBASE AUTH
+        // LOGIN EXCLUSIVO VIA FIREBASE AUTH
         window.executarLoginFirebase = async function(e) {
             e.preventDefault();
             const usuarioOuEmail = document.getElementById("loginUsuario")?.value.trim();
@@ -667,7 +666,7 @@
                 });
         };
 
-        // POP-UP E RECUPERAÇÃO DE SENHA POR USUÁRIO
+        // POP-UP E RECUPERAÇÃO DE SENHA POR USUÁRIO (BUSCA AUTOMÁTICA DO E-MAIL)
         window.abrirModalRecuperarSenha = function() {
             const modal = document.getElementById("modalRecuperarSenha");
             if (modal) { modal.classList.remove("hidden"); modal.classList.add("flex"); }
@@ -686,7 +685,7 @@
             const btn = document.getElementById("btnEnviarRecuperacao");
             if (btn) btn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Buscando...`;
 
-            let emailFinal = usernameInput;
+            let emailEnvio = usernameInput;
             if (!usernameInput.includes("@")) {
                 try {
                     const dbSnap = await get(dbRef(db, 'usuarios_sistema'));
@@ -695,7 +694,7 @@
                         for (let key in lista) {
                             if (lista[key].username && lista[key].username.toLowerCase() === usernameInput.toLowerCase()) {
                                 if (lista[key].email) {
-                                    emailFinal = lista[key].email;
+                                    emailEnvio = lista[key].email;
                                     break;
                                 }
                             }
@@ -704,7 +703,7 @@
                 } catch (err) {}
             }
 
-            sendPasswordResetEmail(auth, emailFinal)
+            sendPasswordResetEmail(auth, emailEnvio)
                 .then(() => {
                     alert(`📧 Um e-mail com o link de redefinição de senha foi enviado para a conta associada ao usuário "${usernameInput}". Verifique sua caixa de entrada.`);
                     window.fecharModalRecuperarSenha();
@@ -716,7 +715,7 @@
                 });
         };
 
-        // CONTROLE DO MODAL DE CADASTRO DE NOVO USUÁRIO (EXCLUSIVO DO ADM)
+        // MODAL E CADASTRO EXCLUSIVO PARA O ADMINISTRADOR
         window.abrirModalCadastroUsuario = function() {
             const modal = document.getElementById("modalCadastroUsuario");
             if (modal) { modal.classList.remove("hidden"); modal.classList.add("flex"); }
@@ -1136,10 +1135,8 @@
                 if (lblL) lblL.innerText = caixasTexto[indiceCaixaTextoAtiva].larguraCaixa + "px";
             }
 
-            // 1. Imagem Base
             ctxLive.putImageData(canvasOriginalContextData, 0, 0);
             
-            // 2. Filtros
             if (window.filtroAtivo !== 'original' || valBrilho !== 0 || valContraste !== 0) {
                 const imgData = ctxLive.getImageData(0, 0, larguraCrop, alturaCrop);
                 const data = imgData.data;
@@ -1179,7 +1176,6 @@
                 ctxLive.putImageData(imgData, 0, 0);
             }
 
-            // 3. Renderiza Caixas de Texto
             caixasTexto.forEach((caixa, index) => {
                 if (caixa.texto.trim() !== "") {
                     caixa.dimensaoCalculada = desenharTextoEstiloDocumentoAutoAjustavel(
@@ -1197,7 +1193,6 @@
                 }
             });
 
-            // 4. Renderiza Assinatura
             if (imgAssinaturaElemento) {
                 const slEsc = document.getElementById("sliderEscalaAssinatura");
                 let escala = slEsc ? parseInt(slEsc.value) / 100 : 0.7;
@@ -1632,10 +1627,8 @@
                     snapshot.forEach(child => { 
                         const anexo = { id: child.key, ...child.val() };
                         if (!anexo.tipo) anexo.tipo = 'imagem'; 
-                        if (perfilUsuario === "administrador" || anexo.statusExclusao !== "pendente_aprovacao") {
-                            todosAnexosNaMemoria.push(anexo);
-                            if (anexo.enviadoPor) usuariosUnicos.add(anexo.enviadoPor);
-                        }
+                        todosAnexosNaMemoria.push(anexo);
+                        if (anexo.enviadoPor) usuariosUnicos.add(anexo.enviadoPor);
                     });
                     todosAnexosNaMemoria.sort((a, b) => b.dataEnvio - a.dataEnvio);
                 }
@@ -1953,7 +1946,7 @@
                     if (elSidebarNome) elSidebarNome.innerText = `@${usuarioLogado}`;
                     if (elSidebarPerfil) elSidebarPerfil.innerText = perfilUsuario;
 
-                    // HABILITA O BOTÃO DE CADASTRO DE USUÁRIO EXCLUSIVAMENTE PARA ADMINISTRADORES
+                    // EXIBE O BOTÃO DE CADASTRO NO SIDEBAR APENAS PARA ADMINISTRADORES
                     if (btnCadSidebar) {
                         if (perfilUsuario === "administrador") {
                             btnCadSidebar.classList.remove("hidden");
