@@ -477,7 +477,7 @@
                 </button>
             </div>
 
-            <!-- CONTROLE DE CAIXAS DE TEXTO MÚLTIPLAS -->
+            <!-- CONTROLE DE CAIXAS DE TEXTO MÚLTIPLAS COM BOTÃO NEGRITO -->
             <div class="px-4 mt-2">
                 <div class="bg-gray-800/60 p-3 rounded-xl border border-gray-700/60 flex flex-col gap-3">
                     <div class="flex justify-between items-center">
@@ -490,6 +490,7 @@
                     <div id="painelEdicaoCaixaAtiva" class="flex flex-col gap-3">
                         <div class="flex gap-2 items-center">
                             <textarea id="inputTextoCanvas" rows="2" placeholder="Digite seu texto..." oninput="window.atualizarTextoCaixaAtiva()" class="w-full p-2.5 rounded-lg bg-gray-900 border border-gray-700 text-white text-xs focus:outline-none focus:border-blue-500 resize-none custom-scrollbar"></textarea>
+                            <button id="btnNegritoTexto" onclick="window.alternarNegritoCaixaAtiva()" title="Negrito" class="bg-gray-900 hover:bg-gray-700 border border-gray-700 text-gray-300 font-black px-3 py-2.5 rounded-lg transition"><i class="fas fa-bold"></i></button>
                             <button onclick="window.removerCaixaTextoAtiva()" title="Excluir Caixa Selecionada" class="bg-red-950/60 hover:bg-red-900 border border-red-800/60 text-red-400 p-2.5 rounded-lg transition"><i class="fas fa-trash-alt text-xs"></i></button>
                         </div>
                         
@@ -500,8 +501,8 @@
                             </div>
                             <div class="flex items-center gap-2">
                                 <label class="text-[10px] text-gray-400 font-bold uppercase whitespace-nowrap">Tamanho:</label>
-                                <input type="range" id="sliderTamanhoFonte" min="12" max="72" value="24" oninput="window.atualizarTamanhoCaixaAtiva()">
-                                <span id="lblTamanhoFonte" class="text-xs font-bold text-white w-8">24px</span>
+                                <input type="range" id="sliderTamanhoFonte" min="12" max="100" value="36" oninput="window.atualizarTamanhoCaixaAtiva()">
+                                <span id="lblTamanhoFonte" class="text-xs font-bold text-white w-8">36px</span>
                             </div>
                         </div>
 
@@ -524,19 +525,25 @@
                     <span class="text-xs font-bold text-indigo-400 flex items-center gap-1.5"><i class="fas fa-pen-nib"></i> Ajustar Assinatura (Arraste no canvas)</span>
                     <div class="flex items-center gap-3">
                         <label class="text-[10px] text-gray-400 font-bold uppercase whitespace-nowrap">Tamanho/Escala:</label>
-                        <input type="range" id="sliderEscalaAssinatura" min="20" max="100" value="50" oninput="window.renderizarFiltroAtual(true)">
-                        <button onclick="window.removerAssinaturaCanvas()" class="text-red-400 hover:text-red-300 text-xs p-1"><i class="fas fa-trash-alt"></i></button>
+                        <input type="range" id="sliderEscalaAssinatura" min="30" max="300" value="120" oninput="window.renderizarFiltroAtual(true)">
+                        <button onclick="window.removerAssinaturaCanvas()" class="text-red-400 hover:text-red-300 text-xs p-1" title="Remover Assinatura"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>
             </div>
 
-            <!-- CONTROLES DO CARIMBO DA EMPRESA -->
+            <!-- CONTROLES DO CARIMBO DA EMPRESA COM ORDEM DE CAMADAS -->
             <div id="painelControleCarimbo" class="hidden px-4 mt-2">
                 <div class="bg-red-950/40 p-3 rounded-xl border border-red-800/60 flex flex-col gap-2">
-                    <span class="text-xs font-bold text-red-400 flex items-center gap-1.5"><i class="fas fa-stamp"></i> Ajustar Carimbo (Arraste no canvas)</span>
-                    <div class="flex items-center gap-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-red-400 flex items-center gap-1.5"><i class="fas fa-stamp"></i> Ajustar Carimbo</span>
+                        <div class="flex gap-1.5">
+                            <button onclick="window.alterarOrdemCarimbo('tras')" class="bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 text-[10px] font-bold px-2 py-1 rounded shadow" title="Enviar para Trás"><i class="fas fa-layer-group text-blue-400"></i> Para Trás</button>
+                            <button onclick="window.alterarOrdemCarimbo('frente')" class="bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 text-[10px] font-bold px-2 py-1 rounded shadow" title="Trazer para Frente"><i class="fas fa-layer-group text-green-400"></i> Para Frente</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 mt-1">
                         <label class="text-[10px] text-gray-400 font-bold uppercase whitespace-nowrap">Tamanho/Escala:</label>
-                        <input type="range" id="sliderEscalaCarimbo" min="20" max="200" value="70" oninput="window.renderizarFiltroAtual(true)">
+                        <input type="range" id="sliderEscalaCarimbo" min="20" max="250" value="85" oninput="window.renderizarFiltroAtual(true)">
                         <button onclick="window.removerCarimboCanvas()" class="text-red-400 hover:text-red-300 text-xs p-1" title="Remover Carimbo"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>
@@ -556,25 +563,25 @@
         </div>
     </div>
 
-    <!-- MODAL 3: POP-UP DE ASSINATURA -->
-    <div id="modalAssinatura" class="fixed inset-0 bg-black/90 popup-blur hidden items-center justify-center p-4 z-[80]">
-        <div class="bg-gray-900 rounded-xl border border-gray-800 p-5 w-full max-w-md shadow-2xl flex flex-col gap-4">
-            <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2"><i class="fas fa-pen-nib text-indigo-400"></i> Assinatura Digital</h3>
-                <button onclick="window.fecharModalAssinatura()" class="text-gray-500 hover:text-white"><i class="fas fa-times text-lg"></i></button>
+    <!-- MODAL 3: POP-UP DE ASSINATURA EXPANDIDO E EM ALTA DEFINIÇÃO -->
+    <div id="modalAssinatura" class="fixed inset-0 bg-black/95 popup-blur hidden items-center justify-center p-4 z-[80]">
+        <div class="bg-gray-900 rounded-2xl border border-gray-800 p-6 w-full max-w-lg shadow-2xl flex flex-col gap-4">
+            <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+                <h3 class="text-base font-bold text-white flex items-center gap-2"><i class="fas fa-pen-nib text-indigo-400"></i> Assinatura Digital (HD)</h3>
+                <button onclick="window.fecharModalAssinatura()" class="text-gray-500 hover:text-white"><i class="fas fa-times text-xl"></i></button>
             </div>
-            <p class="text-xs text-gray-400">Desenhe sua assinatura no quadro abaixo:</p>
-            <div class="w-full h-40 bg-white rounded-lg overflow-hidden relative touch-none border border-gray-700">
+            <p class="text-xs text-gray-400">Desenhe sua assinatura com alta precisão abaixo:</p>
+            <div class="w-full h-56 bg-white rounded-xl overflow-hidden relative touch-none border-2 border-gray-700 shadow-inner">
                 <canvas id="canvasAssinatura" class="w-full h-full cursor-crosshair"></canvas>
             </div>
-            <div class="flex gap-2">
-                <button onclick="window.limparAssinaturaPad()" class="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 py-2.5 rounded-lg text-xs font-bold border border-gray-700 transition"><i class="fas fa-eraser"></i> Limpar</button>
-                <button onclick="window.salvarAssinaturaParaCanvas()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-2.5 px-4 rounded-lg text-xs font-bold transition flex items-center justify-center gap-2"><i class="fas fa-check"></i> Inserir Assinatura</button>
+            <div class="flex gap-3 mt-1">
+                <button onclick="window.limparAssinaturaPad()" class="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 py-3 rounded-xl text-xs font-bold border border-gray-700 transition flex items-center justify-center gap-2"><i class="fas fa-eraser"></i> Limpar</button>
+                <button onclick="window.salvarAssinaturaParaCanvas()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-3 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-lg"><i class="fas fa-check"></i> Inserir Assinatura</button>
             </div>
         </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL E FIREBASE COM SUPORTE A CARIMBO E AUTO LOGOUT -->
+    <!-- SCRIPT PRINCIPAL E FIREBASE COM ASSINATURA HD E CAMADAS DO CARIMBO -->
     <script type="module">
         import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, setPersistence, browserSessionPersistence, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -646,35 +653,48 @@
         let posicaoAssinatura = { x: 50, y: 150 };
         let imgAssinaturaElemento = null;
 
-        // VARIÁVEIS DO CARIMBO
+        // VARIÁVEIS DO CARIMBO E ORDEM DE CAMADAS
         let imgCarimboElemento = null;
         let posicaoCarimbo = { x: 50, y: 50 };
+        let ordemCamadas = ['imagem', 'texto', 'assinatura', 'carimbo'];
 
         let elementoSendoArrastado = null;
         let offsetArrasto = { x: 0, y: 0 };
 
         let assinandoPad = false;
         let ctxAssinaturaPad = null;
+        let pontosTraçoAssinatura = [];
 
         function escutarEventoSeguro(idElemento, evento, callback) {
             const el = document.getElementById(idElemento);
             if (el) el.addEventListener(evento, callback);
         }
 
-        // GERADOR DINÂMICO DO CARIMBO COM DADOS DO PDF
+        // ALTERA ORDEM DAS CAMADAS DO CARIMBO (FRENTE / TRÁS)
+        window.alterarOrdemCarimbo = function(direcao) {
+            ordemCamadas = ordemCamadas.filter(c => c !== 'carimbo');
+            if (direcao === 'tras') {
+                ordemCamadas.unshift('carimbo');
+            } else {
+                ordemCamadas.push('carimbo');
+            }
+            window.renderizarFiltroAtual(true);
+        };
+
+        // GERADOR DO CARIMBO LIMPO (SEM A FRASE SOLICITADA)
         function criarImagemCarimboVetor() {
             const canvasC = document.createElement('canvas');
             canvasC.width = 460;
-            canvasC.height = 200;
+            canvasC.height = 160;
             const ctxC = canvasC.getContext('2d');
 
             ctxC.clearRect(0, 0, canvasC.width, canvasC.height);
 
-            const corCarimbo = "#1e3a8a"; // Azul Carimbo Oficial (ou #b91c1c para vermelho)
+            const corCarimbo = "#1e3a8a"; 
             ctxC.strokeStyle = corCarimbo;
             ctxC.fillStyle = corCarimbo;
 
-            // Bordas Duplas do Carimbo
+            // Bordas Duplas
             ctxC.lineWidth = 5;
             ctxC.strokeRect(10, 10, canvasC.width - 20, canvasC.height - 20);
             ctxC.lineWidth = 2;
@@ -683,7 +703,6 @@
             ctxC.textAlign = "center";
             ctxC.textBaseline = "middle";
 
-            // Texto do Carimbo extraído do documento PDF
             ctxC.font = "bold 20px 'Courier New', Courier, monospace";
             ctxC.fillText("CNPJ: 47.960.950/1716-001", canvasC.width / 2, 42);
 
@@ -694,14 +713,6 @@
             ctxC.fillText("Rua Doutor Feliciano Sodré, 218 - Centro", canvasC.width / 2, 110);
             ctxC.fillText("CEP 24.440-440 - São Gonçalo/RJ", canvasC.width / 2, 132);
 
-            ctxC.lineWidth = 2;
-            ctxC.beginPath();
-            ctxC.moveTo(30, 152); ctxC.lineTo(canvasC.width - 30, 152);
-            ctxC.stroke();
-
-            ctxC.font = "bold italic 13px 'Courier New', monospace";
-            ctxC.fillText("DOCUMENTO CONFERIDO / AUTENTICADO", canvasC.width / 2, 172);
-
             const img = new Image();
             img.src = canvasC.toDataURL("image/png");
             return img;
@@ -710,7 +721,7 @@
         window.adicionarCarimboEmpresa = function() {
             imgCarimboElemento = criarImagemCarimboVetor();
             imgCarimboElemento.onload = function() {
-                posicaoCarimbo = { x: (larguraCrop - 350) / 2, y: (alturaCrop / 2) - 100 };
+                posicaoCarimbo = { x: (larguraCrop - 380) / 2, y: (alturaCrop / 2) - 80 };
                 const pCar = document.getElementById("painelControleCarimbo");
                 if (pCar) { pCar.classList.remove("hidden"); pCar.classList.add("flex"); }
                 const txtB = document.getElementById("txtBtnCarimbo");
@@ -728,7 +739,7 @@
             window.renderizarFiltroAtual(true);
         };
 
-        // LOGIN RECONHECENDO ESTRITAMENTE O USERNAME NO BANCO DE DADOS
+        // LOGIN RECONHECENDO USERNAME
         window.executarLoginFirebase = async function(e) {
             e.preventDefault();
             const usernameDigitado = document.getElementById("loginUsuario")?.value.trim();
@@ -1020,18 +1031,21 @@
                 posicao: { x: (larguraCrop - larguraCaixaPadrao) / 2, y: (alturaCrop / 2) - 50 },
                 cor: "#000000",
                 tamanhoFonte: 36,
+                negrito: false,
                 larguraCaixa: larguraCaixaPadrao,
                 dimensaoCalculada: { w: larguraCaixaPadrao, h: 50 }
             }];
             indiceCaixaTextoAtiva = 0;
 
-            let larguraAssPadrao = larguraCrop * 0.45;
+            // LARGURA INICIAL DA ASSINATURA AUMENTADA
+            let larguraAssPadrao = larguraCrop * 0.65;
             posicaoAssinatura = { x: (larguraCrop - larguraAssPadrao) / 2, y: (alturaCrop / 2) + 50 };
             imgAssinaturaElemento = null;
             imgCarimboElemento = null;
             
             const slB = document.getElementById("sliderBrilho"); if (slB) slB.value = 0;
             const slC = document.getElementById("sliderContraste"); if (slC) slC.value = 0;
+            const slAss = document.getElementById("sliderEscalaAssinatura"); if (slAss) slAss.value = 120;
             
             const pAss = document.getElementById("painelControleAssinatura"); if (pAss) { pAss.classList.add("hidden"); pAss.classList.remove("flex"); }
             const pCar = document.getElementById("painelControleCarimbo"); if (pCar) { pCar.classList.add("hidden"); pCar.classList.remove("flex"); }
@@ -1100,6 +1114,7 @@
                 posicao: { x: (larguraCrop - larguraCaixaPadrao) / 2, y: 100 + (caixasTexto.length * 40) },
                 cor: "#000000",
                 tamanhoFonte: 36,
+                negrito: false,
                 larguraCaixa: larguraCaixaPadrao,
                 dimensaoCalculada: { w: larguraCaixaPadrao, h: 50 }
             };
@@ -1118,9 +1133,18 @@
             }
         };
 
+        window.alternarNegritoCaixaAtiva = function() {
+            if (indiceCaixaTextoAtiva !== null && caixasTexto[indiceCaixaTextoAtiva]) {
+                caixasTexto[indiceCaixaTextoAtiva].negrito = !caixasTexto[indiceCaixaTextoAtiva].negrito;
+                sincronizarPainelComCaixaAtiva();
+                window.renderizarFiltroAtual(true);
+            }
+        };
+
         function sincronizarPainelComCaixaAtiva() {
             const painel = document.getElementById("painelEdicaoCaixaAtiva");
             const msg = document.getElementById("msgSemCaixaTexto");
+            const btnN = document.getElementById("btnNegritoTexto");
 
             if (indiceCaixaTextoAtiva !== null && caixasTexto[indiceCaixaTextoAtiva]) {
                 const caixa = caixasTexto[indiceCaixaTextoAtiva];
@@ -1132,6 +1156,16 @@
                 const slFonte = document.getElementById("sliderTamanhoFonte"); if (slFonte) slFonte.value = caixa.tamanhoFonte;
                 const slLarg = document.getElementById("sliderLarguraCaixaTexto"); 
                 if (slLarg) { slLarg.max = larguraCrop; slLarg.value = caixa.larguraCaixa; }
+
+                if (btnN) {
+                    if (caixa.negrito) {
+                        btnN.classList.replace("bg-gray-900", "bg-blue-600");
+                        btnN.classList.replace("text-gray-300", "text-white");
+                    } else {
+                        btnN.classList.replace("bg-blue-600", "bg-gray-900");
+                        btnN.classList.replace("text-white", "text-gray-300");
+                    }
+                }
             } else {
                 if (painel) { painel.classList.add("hidden"); painel.classList.remove("flex"); }
                 if (msg) msg.classList.remove("hidden");
@@ -1170,19 +1204,20 @@
             }
         };
 
-        function desenharTextoEstiloDocumentoAutoAjustavel(ctx, texto, x, y, larguraCaixaMax, tamanhoFonteDesejado, cor) {
-            ctx.fillStyle = cor;
+        function desenharTextoEstiloDocumentoAutoAjustavel(ctx, caixa, x, y) {
+            ctx.fillStyle = caixa.cor;
             ctx.textBaseline = "top";
             
-            let tamanhoFonteFinal = tamanhoFonteDesejado;
+            let tamanhoFonteFinal = caixa.tamanhoFonte;
             let linhasFinais = [];
             let alturaLinha = tamanhoFonteFinal * 1.25;
+            let estiloFonte = caixa.negrito ? "bold " : "";
 
             while (tamanhoFonteFinal > 8) {
-                ctx.font = `${tamanhoFonteFinal}px Arial`;
+                ctx.font = `${estiloFonte}${tamanhoFonteFinal}px Arial`;
                 alturaLinha = tamanhoFonteFinal * 1.25;
                 
-                let linhasBrutas = texto.split('\n');
+                let linhasBrutas = caixa.texto.split('\n');
                 linhasFinais = [];
                 let palavraExcedeLargura = false;
 
@@ -1192,7 +1227,7 @@
 
                     for (let n = 0; n < palavras.length; n++) {
                         let larguraPalavraUnica = ctx.measureText(palavras[n]).width;
-                        if (larguraPalavraUnica > larguraCaixaMax) {
+                        if (larguraPalavraUnica > caixa.larguraCaixa) {
                             palavraExcedeLargura = true;
                             break;
                         }
@@ -1200,7 +1235,7 @@
                         let linhaTeste = linhaAtual + palavras[n] + ' ';
                         let larguraTeste = ctx.measureText(linhaTeste).width;
 
-                        if (larguraTeste > larguraCaixaMax && n > 0) {
+                        if (larguraTeste > caixa.larguraCaixa && n > 0) {
                             linhasFinais.push(linhaAtual);
                             linhaAtual = palavras[n] + ' ';
                         } else {
@@ -1220,7 +1255,7 @@
             }
 
             return {
-                w: larguraCaixaMax,
+                w: caixa.larguraCaixa,
                 h: Math.max(alturaLinha, linhasFinais.length * alturaLinha)
             };
         }
@@ -1245,7 +1280,7 @@
             // 1. Imagem Base
             ctxLive.putImageData(canvasOriginalContextData, 0, 0);
             
-            // 2. Filtros
+            // 2. Filtros de Imagem
             if (window.filtroAtivo !== 'original' || valBrilho !== 0 || valContraste !== 0) {
                 const imgData = ctxLive.getImageData(0, 0, larguraCrop, alturaCrop);
                 const data = imgData.data;
@@ -1285,49 +1320,47 @@
                 ctxLive.putImageData(imgData, 0, 0);
             }
 
-            // 3. Renderiza Caixas de Texto
-            caixasTexto.forEach((caixa, index) => {
-                if (caixa.texto.trim() !== "") {
-                    caixa.dimensaoCalculada = desenharTextoEstiloDocumentoAutoAjustavel(
-                        ctxLive, caixa.texto, caixa.posicao.x, caixa.posicao.y, caixa.larguraCaixa, caixa.tamanhoFonte, caixa.cor
-                    );
+            // DESENHA CAMADAS CONFORME ORDEM DEFINIDA
+            ordemCamadas.forEach(camada => {
+                if (camada === 'texto') {
+                    caixasTexto.forEach((caixa, index) => {
+                        if (caixa.texto.trim() !== "") {
+                            caixa.dimensaoCalculada = desenharTextoEstiloDocumentoAutoAjustavel(
+                                ctxLive, caixa, caixa.posicao.x, caixa.posicao.y
+                            );
+
+                            if (mostrarGuias) {
+                                let eSelecionada = (index === indiceCaixaTextoAtiva);
+                                ctxLive.strokeStyle = eSelecionada ? "rgba(59, 130, 246, 0.9)" : "rgba(156, 163, 175, 0.4)";
+                                ctxLive.lineWidth = eSelecionada ? 2 : 1;
+                                ctxLive.setLineDash([4, 4]);
+                                ctxLive.strokeRect(caixa.posicao.x - 4, caixa.posicao.y - 4, caixa.dimensaoCalculada.w + 8, caixa.dimensaoCalculada.h + 8);
+                                ctxLive.setLineDash([]);
+                            }
+                        }
+                    });
+                } else if (camada === 'assinatura' && imgAssinaturaElemento) {
+                    const slEsc = document.getElementById("sliderEscalaAssinatura");
+                    let escala = slEsc ? parseInt(slEsc.value) / 100 : 1.2;
+                    let larguraAss = (larguraCrop * 0.45) * escala;
+                    let alturaAss = (imgAssinaturaElemento.height * larguraAss) / imgAssinaturaElemento.width;
+                    ctxLive.drawImage(imgAssinaturaElemento, posicaoAssinatura.x, posicaoAssinatura.y, larguraAss, alturaAss);
+                } else if (camada === 'carimbo' && imgCarimboElemento) {
+                    const slCar = document.getElementById("sliderEscalaCarimbo");
+                    let escalaC = slCar ? parseInt(slCar.value) / 100 : 0.85;
+                    let larguraCar = 380 * escalaC;
+                    let alturaCar = (imgCarimboElemento.height * larguraCar) / imgCarimboElemento.width;
+                    ctxLive.drawImage(imgCarimboElemento, posicaoCarimbo.x, posicaoCarimbo.y, larguraCar, alturaCar);
 
                     if (mostrarGuias) {
-                        let eSelecionada = (index === indiceCaixaTextoAtiva);
-                        ctxLive.strokeStyle = eSelecionada ? "rgba(59, 130, 246, 0.9)" : "rgba(156, 163, 175, 0.4)";
-                        ctxLive.lineWidth = eSelecionada ? 2 : 1;
+                        ctxLive.strokeStyle = "rgba(220, 38, 38, 0.8)";
+                        ctxLive.lineWidth = 2;
                         ctxLive.setLineDash([4, 4]);
-                        ctxLive.strokeRect(caixa.posicao.x - 4, caixa.posicao.y - 4, caixa.dimensaoCalculada.w + 8, caixa.dimensaoCalculada.h + 8);
+                        ctxLive.strokeRect(posicaoCarimbo.x - 4, posicaoCarimbo.y - 4, larguraCar + 8, alturaCar + 8);
                         ctxLive.setLineDash([]);
                     }
                 }
             });
-
-            // 4. Renderiza Assinatura
-            if (imgAssinaturaElemento) {
-                const slEsc = document.getElementById("sliderEscalaAssinatura");
-                let escala = slEsc ? parseInt(slEsc.value) / 100 : 0.7;
-                let larguraAss = (larguraCrop * 0.45) * escala;
-                let alturaAss = (imgAssinaturaElemento.height * larguraAss) / imgAssinaturaElemento.width;
-                ctxLive.drawImage(imgAssinaturaElemento, posicaoAssinatura.x, posicaoAssinatura.y, larguraAss, alturaAss);
-            }
-
-            // 5. Renderiza Carimbo da Empresa
-            if (imgCarimboElemento) {
-                const slCar = document.getElementById("sliderEscalaCarimbo");
-                let escalaC = slCar ? parseInt(slCar.value) / 100 : 0.7;
-                let larguraCar = 380 * escalaC;
-                let alturaCar = (imgCarimboElemento.height * larguraCar) / imgCarimboElemento.width;
-                ctxLive.drawImage(imgCarimboElemento, posicaoCarimbo.x, posicaoCarimbo.y, larguraCar, alturaCar);
-
-                if (mostrarGuias) {
-                    ctxLive.strokeStyle = "rgba(220, 38, 38, 0.8)";
-                    ctxLive.lineWidth = 2;
-                    ctxLive.setLineDash([4, 4]);
-                    ctxLive.strokeRect(posicaoCarimbo.x - 4, posicaoCarimbo.y - 4, larguraCar + 8, alturaCar + 8);
-                    ctxLive.setLineDash([]);
-                }
-            }
         };
 
         function configurarEventosArrastoCanvas(canvas) {
@@ -1348,7 +1381,7 @@
 
                 if (imgCarimboElemento) {
                     const slCar = document.getElementById("sliderEscalaCarimbo");
-                    let escalaC = slCar ? parseInt(slCar.value) / 100 : 0.7;
+                    let escalaC = slCar ? parseInt(slCar.value) / 100 : 0.85;
                     let larguraCar = 380 * escalaC;
                     let alturaCar = (imgCarimboElemento.height * larguraCar) / imgCarimboElemento.width;
 
@@ -1362,7 +1395,7 @@
                 
                 if (imgAssinaturaElemento) {
                     const slEsc = document.getElementById("sliderEscalaAssinatura");
-                    let escala = slEsc ? parseInt(slEsc.value) / 100 : 0.7;
+                    let escala = slEsc ? parseInt(slEsc.value) / 100 : 1.2;
                     let larguraAss = (larguraCrop * 0.45) * escala;
                     let alturaAss = (imgAssinaturaElemento.height * larguraAss) / imgAssinaturaElemento.width;
                     
@@ -1424,19 +1457,29 @@
             canvas.ontouchend = finalizarArrasto;
         }
 
+        // ASSINATURA HD COM CURVAS BÉZIER E RESULUÇÃO AJUSTADA
         window.abrirModalAssinatura = function() {
             const modal = document.getElementById("modalAssinatura");
             if (modal) { modal.classList.remove("hidden"); modal.classList.add("flex"); }
             
             const canvasAss = document.getElementById("canvasAssinatura");
             if (!canvasAss) return;
-            canvasAss.width = canvasAss.offsetWidth;
-            canvasAss.height = canvasAss.offsetHeight;
+
+            const ratio = window.devicePixelRatio || 1;
+            const width = canvasAss.offsetWidth;
+            const height = canvasAss.offsetHeight;
+
+            canvasAss.width = width * ratio;
+            canvasAss.height = height * ratio;
             
             ctxAssinaturaPad = canvasAss.getContext("2d");
+            ctxAssinaturaPad.scale(ratio, ratio);
             ctxAssinaturaPad.strokeStyle = "#000000";
-            ctxAssinaturaPad.lineWidth = 2.5;
+            ctxAssinaturaPad.lineWidth = 3;
             ctxAssinaturaPad.lineCap = "round";
+            ctxAssinaturaPad.lineJoin = "round";
+
+            pontosTraçoAssinatura = [];
 
             const getPosPad = (e) => {
                 const rect = canvasAss.getBoundingClientRect();
@@ -1445,8 +1488,29 @@
                 return { x: clientX - rect.left, y: clientY - rect.top };
             };
 
-            const iniciar = (e) => { assinandoPad = true; const p = getPosPad(e); ctxAssinaturaPad.beginPath(); ctxAssinaturaPad.moveTo(p.x, p.y); };
-            const desenhar = (e) => { if (!assinandoPad) return; const p = getPosPad(e); ctxAssinaturaPad.lineTo(p.x, p.y); ctxAssinaturaPad.stroke(); };
+            const iniciar = (e) => { 
+                assinandoPad = true; 
+                const p = getPosPad(e); 
+                pontosTraçoAssinatura = [p];
+                ctxAssinaturaPad.beginPath(); 
+                ctxAssinaturaPad.moveTo(p.x, p.y); 
+            };
+
+            const desenhar = (e) => { 
+                if (!assinandoPad) return; 
+                e.preventDefault();
+                const p = getPosPad(e); 
+                pontosTraçoAssinatura.push(p);
+
+                if (pontosTraçoAssinatura.length > 2) {
+                    const len = pontosTraçoAssinatura.length;
+                    const xc = (pontosTraçoAssinatura[len - 1].x + pontosTraçoAssinatura[len - 2].x) / 2;
+                    const yc = (pontosTraçoAssinatura[len - 1].y + pontosTraçoAssinatura[len - 2].y) / 2;
+                    ctxAssinaturaPad.quadraticCurveTo(pontosTraçoAssinatura[len - 2].x, pontosTraçoAssinatura[len - 2].y, xc, yc);
+                    ctxAssinaturaPad.stroke();
+                }
+            };
+
             const parar = () => { assinandoPad = false; };
 
             canvasAss.onmousedown = iniciar; canvasAss.onmousemove = desenhar; canvasAss.onmouseup = parar;
@@ -1456,7 +1520,9 @@
         window.limparAssinaturaPad = function() {
             const canvasAss = document.getElementById("canvasAssinatura");
             if (ctxAssinaturaPad && canvasAss) {
-                ctxAssinaturaPad.clearRect(0, 0, canvasAss.width, canvasAss.height);
+                const ratio = window.devicePixelRatio || 1;
+                ctxAssinaturaPad.clearRect(0, 0, canvasAss.width / ratio, canvasAss.height / ratio);
+                pontosTraçoAssinatura = [];
             }
         };
 
@@ -1512,8 +1578,8 @@
                 imgAssinaturaElemento: imgAssinaturaElemento,
                 imgCarimboElemento: imgCarimboElemento,
                 posicaoCarimbo: { ...posicaoCarimbo },
-                escalaCarimbo: document.getElementById("sliderEscalaCarimbo") ? document.getElementById("sliderEscalaCarimbo").value : 70,
-                escalaAssinatura: document.getElementById("sliderEscalaAssinatura") ? document.getElementById("sliderEscalaAssinatura").value : 70,
+                escalaCarimbo: document.getElementById("sliderEscalaCarimbo") ? document.getElementById("sliderEscalaCarimbo").value : 85,
+                escalaAssinatura: document.getElementById("sliderEscalaAssinatura") ? document.getElementById("sliderEscalaAssinatura").value : 120,
                 brilho: document.getElementById("sliderBrilho") ? document.getElementById("sliderBrilho").value : 0,
                 contraste: document.getElementById("sliderContraste") ? document.getElementById("sliderContraste").value : 0,
                 finalDataUrl: imgSalvaDataUrl
@@ -1582,8 +1648,8 @@
             imgCarimboElemento = pag.imgCarimboElemento;
             posicaoCarimbo = { ...pag.posicaoCarimbo };
 
-            const slEsc = document.getElementById("sliderEscalaAssinatura"); if (slEsc) slEsc.value = pag.escalaAssinatura;
-            const slCar = document.getElementById("sliderEscalaCarimbo"); if (slCar) slCar.value = pag.escalaCarimbo || 70;
+            const slEsc = document.getElementById("sliderEscalaAssinatura"); if (slEsc) slEsc.value = pag.escalaAssinatura || 120;
+            const slCar = document.getElementById("sliderEscalaCarimbo"); if (slCar) slCar.value = pag.escalaCarimbo || 85;
             const slB = document.getElementById("sliderBrilho"); if (slB) slB.value = pag.brilho;
             const slC = document.getElementById("sliderContraste"); if (slC) slC.value = pag.contraste;
 
@@ -2106,7 +2172,6 @@
                     if (elSidebarNome) elSidebarNome.innerText = `@${usuarioLogado}`;
                     if (elSidebarPerfil) elSidebarPerfil.innerText = perfilUsuario;
 
-                    // EXIBE O BOTÃO DE CADASTRO NO SIDEBAR APENAS PARA ADMINISTRADORES
                     if (btnCadSidebar) {
                         if (perfilUsuario === "administrador") {
                             btnCadSidebar.classList.remove("hidden");
