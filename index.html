@@ -559,7 +559,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL E FIREBASE COM AUTENTICAÇÃO RESTRITA POR USERNAME -->
+    <!-- SCRIPT PRINCIPAL E FIREBASE COM CORREÇÃO DE BUSCA E CONTINGÊNCIA -->
     <script type="module">
         import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -620,7 +620,7 @@
             if (el) el.addEventListener(evento, callback);
         }
 
-        // LOGIN RECONHECENDO ESTRITAMENTE O USERNAME NO BANCO DE DADOS
+        // LOGIN POR USERNAME COM BUSCA INTELIGENTE NO BANCO OU FALLBACK DE E-MAIL
         window.executarLoginFirebase = async function(e) {
             e.preventDefault();
             const usernameDigitado = document.getElementById("loginUsuario")?.value.trim();
@@ -632,25 +632,31 @@
 
             let emailVinculado = null;
 
+            // BUSCA O E-MAIL DO USUÁRIO NO BANCO DE DADOS
             try {
                 const dbSnap = await get(dbRef(db, 'usuarios_sistema'));
                 if (dbSnap.exists()) {
                     const lista = dbSnap.val();
                     for (let key in lista) {
                         if (lista[key].username && lista[key].username.toLowerCase() === usernameDigitado.toLowerCase()) {
-                            emailVinculado = lista[key].email;
-                            break;
+                            if (lista[key].email) {
+                                emailVinculado = lista[key].email;
+                                break;
+                            }
                         }
                     }
                 }
             } catch (err) {
-                console.error("Erro na busca de usuário:", err);
+                console.warn("Aviso de leitura no banco. Tentando formato padrão de e-mail:", err);
             }
 
+            // SE NÃO ACHOU O E-MAIL NO BANCO, TESTA A ESTRUTURA DIRETA SE TIVER O ARROBA OU O DOMÍNIO PADRÃO
             if (!emailVinculado) {
-                alert("❌ Usuário não encontrado no sistema.");
-                if (btn) btn.innerText = "Entrar";
-                return;
+                if (usernameDigitado.includes("@")) {
+                    emailVinculado = usernameDigitado;
+                } else {
+                    emailVinculado = `${usernameDigitado}@anexos.com`;
+                }
             }
 
             signInWithEmailAndPassword(auth, emailVinculado, senha)
@@ -659,12 +665,12 @@
                     if (modalLogin) modalLogin.classList.add("hidden");
                 })
                 .catch((error) => {
-                    alert("❌ Senha incorreta.");
+                    alert("❌ Usuário ou senha incorretos.");
                     if (btn) btn.innerText = "Entrar";
                 });
         };
 
-        // RECUPERAÇÃO DE SENHA BUSCANDO O E-MAIL PELO USERNAME DIGITADO NO POP-UP
+        // RECUPERAÇÃO DE SENHA POR USERNAME
         window.abrirModalRecuperarSenha = function() {
             const modal = document.getElementById("modalRecuperarSenha");
             if (modal) { modal.classList.remove("hidden"); modal.classList.add("flex"); }
@@ -683,24 +689,24 @@
             const btn = document.getElementById("btnEnviarRecuperacao");
             if (btn) btn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Buscando...`;
 
-            let emailEncontrado = null;
-            try {
-                const dbSnap = await get(dbRef(db, 'usuarios_sistema'));
-                if (dbSnap.exists()) {
-                    const lista = dbSnap.val();
-                    for (let key in lista) {
-                        if (lista[key].username && lista[key].username.toLowerCase() === usernameInput.toLowerCase()) {
-                            emailEncontrado = lista[key].email;
-                            break;
+            let emailEncontrado = usernameInput.includes("@") ? usernameInput : null;
+            if (!emailEncontrado) {
+                try {
+                    const dbSnap = await get(dbRef(db, 'usuarios_sistema'));
+                    if (dbSnap.exists()) {
+                        const lista = dbSnap.val();
+                        for (let key in lista) {
+                            if (lista[key].username && lista[key].username.toLowerCase() === usernameInput.toLowerCase()) {
+                                emailEncontrado = lista[key].email;
+                                break;
+                            }
                         }
                     }
-                }
-            } catch (err) {}
+                } catch (err) {}
+            }
 
             if (!emailEncontrado) {
-                alert(`❌ Nenhum usuário com o nome "${usernameInput}" foi encontrado.`);
-                if (btn) btn.innerText = "Enviar Link";
-                return;
+                emailEncontrado = `${usernameInput}@anexos.com`;
             }
 
             sendPasswordResetEmail(auth, emailEncontrado)
