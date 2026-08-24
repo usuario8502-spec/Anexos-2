@@ -115,7 +115,7 @@
 </head>
 <body class="bg-gray-950 text-gray-100 font-sans min-h-screen flex flex-col relative pb-24">
 
-    <!-- MODAL DE LOGIN EMBUTIDO -->
+    <!-- MODAL DE LOGIN COM RECUPERAÇÃO DE SENHA -->
     <div id="modalLoginApp" class="fixed inset-0 bg-black/95 popup-blur z-[100] flex items-center justify-center p-4">
         <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-sm shadow-2xl flex flex-col gap-4">
             <div class="text-center flex flex-col items-center gap-2">
@@ -123,7 +123,7 @@
                     <i class="fas fa-lock"></i>
                 </div>
                 <h2 class="text-lg font-bold text-white">Acessar o Sistema</h2>
-                <p class="text-xs text-gray-400">Entre com sua conta do Firebase para visualizar e gerenciar anexos.</p>
+                <p class="text-xs text-gray-400">Entre com sua conta do Firebase para gerenciar anexos.</p>
             </div>
 
             <form onsubmit="window.executarLoginFirebase(event)" class="flex flex-col gap-3">
@@ -132,8 +132,11 @@
                     <input type="email" id="loginEmail" required placeholder="seu@email.com" class="p-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-xs focus:outline-none focus:border-blue-500">
                 </div>
                 <div class="flex flex-col gap-1">
-                    <label class="text-[10px] text-gray-400 font-bold uppercase">Senha</label>
-                    <input type="password" id="loginSenha" required placeholder="******" class="p-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-xs focus:outline-none focus:border-blue-500">
+                    <div class="flex justify-between items-center">
+                        <label class="text-[10px] text-gray-400 font-bold uppercase">Senha</label>
+                        <button type="button" onclick="window.executarRecuperacaoSenhaFirebase()" class="text-[10px] text-blue-400 hover:underline font-semibold">Esqueceu a senha?</button>
+                    </div>
+                    <input type="password" id="loginSenha" placeholder="******" class="p-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-xs focus:outline-none focus:border-blue-500">
                 </div>
 
                 <div class="flex gap-2 mt-2">
@@ -385,7 +388,7 @@
         </div>
     </div>
 
-    <!-- MODAL 2: APLICADOR DE FILTROS -->
+    <!-- MODAL 2: APLICADOR DE FILTROS E MÚLTIPLAS CAIXAS -->
     <div id="modalFiltrosScanner" class="fixed inset-0 bg-gray-950 z-[70] hidden flex-col overflow-y-auto">
         <div class="flex justify-between items-center bg-gray-900 border-b border-gray-800 p-4 shadow-md">
             <button onclick="window.voltarParaCropper()" class="text-gray-400 hover:text-white"><i class="fas fa-arrow-left text-xl"></i></button>
@@ -437,7 +440,7 @@
                 </button>
             </div>
 
-            <!-- CONTROLE DE CAIXAS DE TEXTO MÚLTIPLAS -->
+            <!-- CONTROLE DE CAIXAS DE TEXTO -->
             <div class="px-4 mt-2">
                 <div class="bg-gray-800/60 p-3 rounded-xl border border-gray-700/60 flex flex-col gap-3">
                     <div class="flex justify-between items-center">
@@ -519,11 +522,11 @@
         </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL E FIREBASE COM LEITURA INDEPENDENTE -->
+    <!-- SCRIPT PRINCIPAL E FIREBASE COM RECUPERAÇÃO DE SENHA -->
     <script type="module">
         import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getDatabase, ref as dbRef, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getDatabase, ref as dbRef, push, onValue, update, remove, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
         import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
         // CREDENCIAIS DO FIREBASE (PROJETO: anexos-2)
@@ -580,7 +583,7 @@
             if (el) el.addEventListener(evento, callback);
         }
 
-        // FUNÇÕES DE LOGIN/CADASTRO DO FIREBASE
+        // FUNÇÕES DE LOGIN/CADASTRO/RECUPERAÇÃO DE SENHA
         window.executarLoginFirebase = function(e) {
             e.preventDefault();
             const email = document.getElementById("loginEmail")?.value.trim();
@@ -611,7 +614,7 @@
                 .then((userCredential) => {
                     const user = userCredential.user;
                     const username = user.email.split('@')[0];
-                    update(dbRef(db, 'usuarios_sistema/' + user.uid), {
+                    set(dbRef(db, 'usuarios_sistema/' + user.uid), {
                         username: username,
                         perfil: "operador"
                     }).then(() => {
@@ -622,6 +625,21 @@
                 .catch((error) => {
                     alert("Erro ao cadastrar: " + error.message);
                     if (btn) btn.innerText = "Cadastrar";
+                });
+        };
+
+        window.executarRecuperacaoSenhaFirebase = function() {
+            const email = document.getElementById("loginEmail")?.value.trim();
+            if (!email) {
+                return alert("⚠️ Por favor, digite seu e-mail no campo acima para receber o link de redefinição de senha.");
+            }
+
+            sendPasswordResetEmail(auth, email)
+                .then(() => {
+                    alert("📧 E-mail de redefinição de senha enviado com sucesso! Verifique sua caixa de entrada/spam.");
+                })
+                .catch((error) => {
+                    alert("Erro ao solicitar redefinição: " + error.message);
                 });
         };
 
@@ -1001,8 +1019,10 @@
                 if (lblL) lblL.innerText = caixasTexto[indiceCaixaTextoAtiva].larguraCaixa + "px";
             }
 
+            // 1. Imagem Base
             ctxLive.putImageData(canvasOriginalContextData, 0, 0);
             
+            // 2. Filtros
             if (window.filtroAtivo !== 'original' || valBrilho !== 0 || valContraste !== 0) {
                 const imgData = ctxLive.getImageData(0, 0, larguraCrop, alturaCrop);
                 const data = imgData.data;
@@ -1042,6 +1062,7 @@
                 ctxLive.putImageData(imgData, 0, 0);
             }
 
+            // 3. Renderiza Caixas de Texto
             caixasTexto.forEach((caixa, index) => {
                 if (caixa.texto.trim() !== "") {
                     caixa.dimensaoCalculada = desenharTextoEstiloDocumentoAutoAjustavel(
@@ -1059,6 +1080,7 @@
                 }
             });
 
+            // 4. Renderiza Assinatura
             if (imgAssinaturaElemento) {
                 const slEsc = document.getElementById("sliderEscalaAssinatura");
                 let escala = slEsc ? parseInt(slEsc.value) / 100 : 0.7;
@@ -1807,7 +1829,7 @@
             if (modal && content) { content.classList.remove("scale-100", "opacity-100"); content.classList.add("scale-95", "opacity-0"); setTimeout(() => { modal.classList.remove("flex"); modal.classList.add("hidden"); }, 200); }
         };
 
-        // CARREGA A GALERIA DE ANEXOS CONTINUAMENTE DO BANCO
+        // CARREGA GALERIA CONTINUAMENTE
         carregarGaleriaDeAnexos();
 
         onAuthStateChanged(auth, (user) => {
