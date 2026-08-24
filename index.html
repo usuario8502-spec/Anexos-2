@@ -115,33 +115,62 @@
 </head>
 <body class="bg-gray-950 text-gray-100 font-sans min-h-screen flex flex-col relative pb-24">
 
-    <!-- MODAL DE LOGIN COM RECUPERAÇÃO DE SENHA -->
+    <!-- MODAL DE LOGIN EMBUTIDO (USUÁRIO E SENHA) -->
     <div id="modalLoginApp" class="fixed inset-0 bg-black/95 popup-blur z-[100] flex items-center justify-center p-4">
         <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-sm shadow-2xl flex flex-col gap-4">
             <div class="text-center flex flex-col items-center gap-2">
                 <div class="w-12 h-12 rounded-full bg-blue-600/20 border border-blue-500/40 flex items-center justify-center text-blue-500 text-xl">
-                    <i class="fas fa-lock"></i>
+                    <i class="fas fa-user-lock"></i>
                 </div>
                 <h2 class="text-lg font-bold text-white">Acessar o Sistema</h2>
-                <p class="text-xs text-gray-400">Entre com sua conta do Firebase para gerenciar anexos.</p>
+                <p class="text-xs text-gray-400">Digite seu usuário e senha. (Teste: admin / admin123)</p>
             </div>
 
-            <form onsubmit="window.executarLoginFirebase(event)" class="flex flex-col gap-3">
+            <!-- FORMULÁRIO DE LOGIN -->
+            <form id="formLogin" onsubmit="window.executarLoginFirebase(event)" class="flex flex-col gap-3">
                 <div class="flex flex-col gap-1">
-                    <label class="text-[10px] text-gray-400 font-bold uppercase">E-mail</label>
-                    <input type="email" id="loginEmail" required placeholder="seu@email.com" class="p-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-xs focus:outline-none focus:border-blue-500">
+                    <label class="text-[10px] text-gray-400 font-bold uppercase">Usuário</label>
+                    <input type="text" id="loginUsuario" required placeholder="Digite seu usuário..." class="p-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-xs focus:outline-none focus:border-blue-500">
                 </div>
                 <div class="flex flex-col gap-1">
                     <div class="flex justify-between items-center">
                         <label class="text-[10px] text-gray-400 font-bold uppercase">Senha</label>
-                        <button type="button" onclick="window.executarRecuperacaoSenhaFirebase()" class="text-[10px] text-blue-400 hover:underline font-semibold">Esqueceu a senha?</button>
+                        <button type="button" onclick="window.executarRecuperacaoSenhaFirebase()" class="text-[10px] text-blue-400 hover:underline font-semibold">Esqueceu?</button>
                     </div>
-                    <input type="password" id="loginSenha" placeholder="******" class="p-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-xs focus:outline-none focus:border-blue-500">
+                    <input type="password" id="loginSenha" required placeholder="******" class="p-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-xs focus:outline-none focus:border-blue-500">
                 </div>
 
                 <div class="flex gap-2 mt-2">
                     <button type="submit" id="btnEntrarLogin" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl font-bold text-xs transition">Entrar</button>
-                    <button type="button" onclick="window.executarCadastroFirebase()" id="btnCadastrarLogin" class="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 py-3 rounded-xl font-bold text-xs transition">Cadastrar</button>
+                    <button type="button" onclick="window.alternarTelaLoginCadastro('cadastro')" class="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 py-3 rounded-xl font-bold text-xs transition">Criar Conta</button>
+                </div>
+            </form>
+
+            <!-- FORMULÁRIO DE CADASTRO (COM SELETOR DE PODERES/PERFIL) -->
+            <form id="formCadastro" onsubmit="window.executarCadastroFirebase(event)" class="hidden flex-col gap-3">
+                <div class="flex flex-col gap-1">
+                    <label class="text-[10px] text-gray-400 font-bold uppercase">Nome de Usuário (Username)</label>
+                    <input type="text" id="cadUsuario" required placeholder="Ex: joao_silva" class="p-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-xs focus:outline-none focus:border-blue-500">
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label class="text-[10px] text-gray-400 font-bold uppercase">E-mail</label>
+                    <input type="email" id="cadEmail" required placeholder="joao@email.com" class="p-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-xs focus:outline-none focus:border-blue-500">
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label class="text-[10px] text-gray-400 font-bold uppercase">Senha</label>
+                    <input type="password" id="cadSenha" required placeholder="Mínimo 6 caracteres..." class="p-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-xs focus:outline-none focus:border-blue-500">
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label class="text-[10px] text-gray-400 font-bold uppercase">Permissão / Poderes no App</label>
+                    <select id="cadPerfil" required class="p-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-xs focus:outline-none focus:border-blue-500">
+                        <option value="operador">Operador (Usuário Comum)</option>
+                        <option value="administrador">Administrador (Poderes Totais)</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-2 mt-2">
+                    <button type="submit" id="btnSalvarCadastro" class="flex-1 bg-green-600 hover:bg-green-500 text-white py-3 rounded-xl font-bold text-xs transition">Salvar Usuário</button>
+                    <button type="button" onclick="window.alternarTelaLoginCadastro('login')" class="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 py-3 rounded-xl font-bold text-xs transition">Voltar ao Login</button>
                 </div>
             </form>
         </div>
@@ -440,7 +469,7 @@
                 </button>
             </div>
 
-            <!-- CONTROLE DE CAIXAS DE TEXTO -->
+            <!-- CONTROLE DE CAIXAS DE TEXTO MÚLTIPLAS -->
             <div class="px-4 mt-2">
                 <div class="bg-gray-800/60 p-3 rounded-xl border border-gray-700/60 flex flex-col gap-3">
                     <div class="flex justify-between items-center">
@@ -522,14 +551,13 @@
         </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL E FIREBASE COM RECUPERAÇÃO DE SENHA -->
+    <!-- SCRIPT PRINCIPAL E FIREBASE COM BUSCA POR USERNAME / E-MAIL -->
     <script type="module">
         import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getDatabase, ref as dbRef, push, onValue, update, remove, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref as dbRef, push, onValue, update, remove, set, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
         import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
-        // CREDENCIAIS DO FIREBASE (PROJETO: anexos-2)
         const firebaseConfig = {
             apiKey: "AIzaSyCQ8--X39oK3BnwNES7zDklKnWP0_4hEas",
             authDomain: "anexos-2.firebaseapp.com",
@@ -583,60 +611,132 @@
             if (el) el.addEventListener(evento, callback);
         }
 
-        // FUNÇÕES DE LOGIN/CADASTRO/RECUPERAÇÃO DE SENHA
-        window.executarLoginFirebase = function(e) {
+        // ALTERNADOR ENTRE FORMULÁRIO DE LOGIN E CADASTRO
+        window.alternarTelaLoginCadastro = function(modo) {
+            const formL = document.getElementById("formLogin");
+            const formC = document.getElementById("formCadastro");
+            if (modo === 'cadastro') {
+                if (formL) formL.classList.add("hidden");
+                if (formC) { formC.classList.remove("hidden"); formC.classList.add("flex"); }
+            } else {
+                if (formC) { formC.classList.add("hidden"); formC.classList.remove("flex"); }
+                if (formL) formL.classList.remove("hidden");
+            }
+        };
+
+        // LOGIN POR USUÁRIO (USERNAME) OU E-MAIL + SUPORTE A ADMIN FICTÍCIO
+        window.executarLoginFirebase = async function(e) {
             e.preventDefault();
-            const email = document.getElementById("loginEmail")?.value.trim();
+            const usuarioOuEmail = document.getElementById("loginUsuario")?.value.trim();
             const senha = document.getElementById("loginSenha")?.value.trim();
             const btn = document.getElementById("btnEntrarLogin");
+
+            if (!usuarioOuEmail || !senha) return alert("Preencha usuário e senha.");
             if (btn) btn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Entrando...`;
 
-            signInWithEmailAndPassword(auth, email, senha)
+            // LOGIN ADMIN FICTÍCIO LOCAL PARA TESTE RÁPIDO
+            if (usuarioOuEmail === "admin" && senha === "admin123") {
+                usuarioLogado = "admin";
+                perfilUsuario = "administrador";
+                const modalLogin = document.getElementById("modalLoginApp");
+                if (modalLogin) modalLogin.classList.add("hidden");
+
+                const elSidebarNome = document.getElementById("sidebarNomeUsuario");
+                const elSidebarPerfil = document.getElementById("sidebarPerfilUsuario");
+                if (elSidebarNome) elSidebarNome.innerText = "@admin";
+                if (elSidebarPerfil) elSidebarPerfil.innerText = "administrador";
+
+                const areaSino = document.getElementById("areaSinoAdmin");
+                if (areaSino) areaSino.classList.remove("hidden");
+                
+                carregarGaleriaDeAnexos();
+                if (btn) btn.innerText = "Entrar";
+                return;
+            }
+
+            // BUSCA DO E-MAIL CORRESPONDENTE SE O USUÁRIO DIGITOU APENAS O USERNAME
+            let emailFinal = usuarioOuEmail;
+            if (!usuarioOuEmail.includes("@")) {
+                try {
+                    const dbSnap = await get(dbRef(db, 'usuarios_sistema'));
+                    if (dbSnap.exists()) {
+                        const lista = dbSnap.val();
+                        let encontrado = false;
+                        for (let key in lista) {
+                            if (lista[key].username && lista[key].username.toLowerCase() === usuarioOuEmail.toLowerCase()) {
+                                if (lista[key].email) {
+                                    emailFinal = lista[key].email;
+                                    encontrado = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!encontrado) emailFinal = `${usuarioOuEmail}@anexos.com`;
+                    } else {
+                        emailFinal = `${usuarioOuEmail}@anexos.com`;
+                    }
+                } catch (err) {
+                    emailFinal = `${usuarioOuEmail}@anexos.com`;
+                }
+            }
+
+            // AUTENTICAÇÃO NO FIREBASE
+            signInWithEmailAndPassword(auth, emailFinal, senha)
                 .then(() => {
                     const modalLogin = document.getElementById("modalLoginApp");
                     if (modalLogin) modalLogin.classList.add("hidden");
                 })
                 .catch((error) => {
-                    alert("Erro ao entrar: " + error.message);
+                    alert("Erro ao entrar: Usuário ou senha incorretos.");
                     if (btn) btn.innerText = "Entrar";
                 });
         };
 
-        window.executarCadastroFirebase = function() {
-            const email = document.getElementById("loginEmail")?.value.trim();
-            const senha = document.getElementById("loginSenha")?.value.trim();
-            if (!email || !senha) return alert("Preencha o e-mail e a senha para cadastrar.");
+        // CADASTRO COM USUÁRIO, E-MAIL, SENHA E PODERES (SELETOR DE PERFIL)
+        window.executarCadastroFirebase = function(e) {
+            if (e) e.preventDefault();
+            const username = document.getElementById("cadUsuario")?.value.trim();
+            const email = document.getElementById("cadEmail")?.value.trim();
+            const senha = document.getElementById("cadSenha")?.value.trim();
+            const perfil = document.getElementById("cadPerfil")?.value;
 
-            const btn = document.getElementById("btnCadastrarLogin");
+            if (!username || !email || !senha || !perfil) {
+                return alert("⚠️ Preencha todos os campos do formulário de cadastro.");
+            }
+
+            const btn = document.getElementById("btnSalvarCadastro");
             if (btn) btn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Cadastrando...`;
 
             createUserWithEmailAndPassword(auth, email, senha)
                 .then((userCredential) => {
                     const user = userCredential.user;
-                    const username = user.email.split('@')[0];
                     set(dbRef(db, 'usuarios_sistema/' + user.uid), {
                         username: username,
-                        perfil: "operador"
+                        email: email,
+                        perfil: perfil
                     }).then(() => {
+                        alert(`✅ Usuário @${username} cadastrado com sucesso como [${perfil.toUpperCase()}]!`);
                         const modalLogin = document.getElementById("modalLoginApp");
                         if (modalLogin) modalLogin.classList.add("hidden");
                     });
                 })
                 .catch((error) => {
                     alert("Erro ao cadastrar: " + error.message);
-                    if (btn) btn.innerText = "Cadastrar";
+                    if (btn) btn.innerText = "Salvar Usuário";
                 });
         };
 
         window.executarRecuperacaoSenhaFirebase = function() {
-            const email = document.getElementById("loginEmail")?.value.trim();
-            if (!email) {
-                return alert("⚠️ Por favor, digite seu e-mail no campo acima para receber o link de redefinição de senha.");
+            const usuarioOuEmail = document.getElementById("loginUsuario")?.value.trim();
+            if (!usuarioOuEmail) {
+                return alert("⚠️ Por favor, digite seu usuário ou e-mail no campo 'Usuário' para receber o e-mail de redefinição.");
             }
 
-            sendPasswordResetEmail(auth, email)
+            let emailEnvio = usuarioOuEmail.includes("@") ? usuarioOuEmail : `${usuarioOuEmail}@anexos.com`;
+
+            sendPasswordResetEmail(auth, emailEnvio)
                 .then(() => {
-                    alert("📧 E-mail de redefinição de senha enviado com sucesso! Verifique sua caixa de entrada/spam.");
+                    alert("📧 E-mail de redefinição de senha enviado! Verifique sua caixa de entrada.");
                 })
                 .catch((error) => {
                     alert("Erro ao solicitar redefinição: " + error.message);
@@ -1019,10 +1119,8 @@
                 if (lblL) lblL.innerText = caixasTexto[indiceCaixaTextoAtiva].larguraCaixa + "px";
             }
 
-            // 1. Imagem Base
             ctxLive.putImageData(canvasOriginalContextData, 0, 0);
             
-            // 2. Filtros
             if (window.filtroAtivo !== 'original' || valBrilho !== 0 || valContraste !== 0) {
                 const imgData = ctxLive.getImageData(0, 0, larguraCrop, alturaCrop);
                 const data = imgData.data;
@@ -1062,7 +1160,6 @@
                 ctxLive.putImageData(imgData, 0, 0);
             }
 
-            // 3. Renderiza Caixas de Texto
             caixasTexto.forEach((caixa, index) => {
                 if (caixa.texto.trim() !== "") {
                     caixa.dimensaoCalculada = desenharTextoEstiloDocumentoAutoAjustavel(
@@ -1080,7 +1177,6 @@
                 }
             });
 
-            // 4. Renderiza Assinatura
             if (imgAssinaturaElemento) {
                 const slEsc = document.getElementById("sliderEscalaAssinatura");
                 let escala = slEsc ? parseInt(slEsc.value) / 100 : 0.7;
