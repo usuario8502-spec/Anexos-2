@@ -14,7 +14,7 @@
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
 
-    <!-- GERADOR DE MANIFEST DINÂMICO PARA PWA COM ICON.PNG -->
+    <!-- MANIFEST DINÂMICO PARA PWA -->
     <script>
         (function() {
             const manifest = {
@@ -55,8 +55,38 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
         .popup-blur { backdrop-filter: blur(5px); }
         
+        /* ESTILOS DO CROPPER CONFORME CÓDIGO ORIGINAL */
         .cropper-view-box { outline: 3px solid rgba(59, 130, 246, 0.9) !important; border-radius: 4px; }
         .cropper-line { background-color: transparent !important; }
+        .cropper-line.line-e { width: 40px !important; right: -20px !important; }
+        .cropper-line.line-w { width: 40px !important; left: -20px !important; }
+        .cropper-line.line-n { height: 40px !important; top: -20px !important; }
+        .cropper-line.line-s { height: 40px !important; bottom: -20px !important; }
+
+        .cropper-point {
+            width: 44px !important;
+            height: 44px !important;
+            background-color: transparent !important;
+            opacity: 1 !important;
+        }
+        .cropper-point::before {
+            content: '';
+            position: absolute;
+            width: 16px; height: 16px;
+            background-color: #3b82f6;
+            border-radius: 50%;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 5px rgba(0,0,0,0.8);
+        }
+        .cropper-point.point-nw { top: -22px !important; left: -22px !important; }
+        .cropper-point.point-ne { top: -22px !important; right: -22px !important; }
+        .cropper-point.point-sw { bottom: -22px !important; left: -22px !important; }
+        .cropper-point.point-se { bottom: -22px !important; right: -22px !important; }
+        .cropper-point.point-n { top: -22px !important; margin-left: -22px !important; }
+        .cropper-point.point-s { bottom: -22px !important; margin-left: -22px !important; }
+        .cropper-point.point-e { right: -22px !important; margin-top: -22px !important; }
+        .cropper-point.point-w { left: -22px !important; margin-top: -22px !important; }
 
         .filtro-ativo { border-color: #3b82f6 !important; background-color: #1e3a8a !important; color: #60a5fa !important; }
 
@@ -170,7 +200,7 @@
         <i class="fas fa-plus"></i>
     </button>
 
-    <!-- MODAL DO SINO: CENTRAL DE NOTIFICAÇÕES -->
+    <!-- MODAL DO SINO DE NOTIFICAÇÕES -->
     <div id="modalNotificacoes" class="fixed inset-0 bg-black/80 popup-blur hidden items-center justify-center p-4 z-50">
         <div class="bg-gray-900 rounded-xl border border-gray-800 p-6 w-full max-w-lg shadow-2xl flex flex-col gap-4 transform transition-all scale-95 opacity-0" id="modalNotificacoesContent">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
@@ -203,6 +233,7 @@
                 </div>
             </div>
 
+            <!-- Preview Visual Dinâmico -->
             <div class="w-full h-64 sm:h-80 bg-gray-950 rounded-lg border border-gray-800 flex items-center justify-center overflow-hidden relative shadow-inner">
                 <img id="imagemEmDestaque" src="" class="max-w-full max-h-full object-contain hidden">
                 <iframe id="iframePreview" src="" class="w-full h-full hidden bg-white rounded-lg"></iframe>
@@ -251,7 +282,17 @@
                 
                 <input type="file" id="inputArquivoGenerico" class="hidden" accept="*/*" multiple onchange="window.processarArquivosLote(this, 'generico')">
 
-                <!-- PREVIEW SCANNER -->
+                <!-- PREVIEW DIVERSOS -->
+                <div id="areaPreviewArquivos" class="hidden flex-col gap-3 mt-2">
+                    <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                        <span class="text-xs font-bold text-blue-400"><i class="fas fa-layer-group"></i> Fila de Envio</span>
+                        <span id="txtQtdFila" class="text-[10px] text-gray-400 bg-gray-800 px-2 py-1 rounded border border-gray-700">0 itens</span>
+                    </div>
+                    <div id="listaArquivosFila" class="flex flex-col gap-2 max-h-40 overflow-y-auto custom-scrollbar pr-1"></div>
+                    <button onclick="window.acionarMaisItens()" class="w-full bg-gray-800 hover:bg-gray-700 border border-dashed border-gray-600 text-gray-300 py-3 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition"><i class="fas fa-plus"></i> Adicionar Mais Itens</button>
+                </div>
+
+                <!-- PREVIEW SCANNER ORIGINAL (CARRINHO COM RE-EDIÇÃO) -->
                 <div id="areaPreviewScanner" class="hidden flex-col gap-3 mt-2">
                     <div class="flex justify-between items-center border-b border-gray-800 pb-2">
                         <span class="text-xs font-bold text-red-400"><i class="fas fa-file-pdf"></i> Páginas Escaneadas</span>
@@ -264,15 +305,6 @@
                     </div>
                 </div>
 
-                <!-- PREVIEW DIVERSOS -->
-                <div id="areaPreviewArquivos" class="hidden flex-col gap-3 mt-2">
-                    <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-                        <span class="text-xs font-bold text-blue-400"><i class="fas fa-layer-group"></i> Fila de Envio</span>
-                        <span id="txtQtdFila" class="text-[10px] text-gray-400 bg-gray-800 px-2 py-1 rounded border border-gray-700">0 itens</span>
-                    </div>
-                    <div id="listaArquivosFila" class="flex flex-col gap-2 max-h-40 overflow-y-auto custom-scrollbar pr-1"></div>
-                    <button onclick="window.acionarMaisItens()" class="w-full bg-gray-800 hover:bg-gray-700 border border-dashed border-gray-600 text-gray-300 py-3 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition"><i class="fas fa-plus"></i> Adicionar Mais Itens</button>
-                </div>
             </div>
 
             <div id="containerProgresso" class="hidden w-full bg-gray-950 rounded-full h-3 border border-gray-800 mt-2">
@@ -306,7 +338,7 @@
         </div>
     </div>
 
-    <!-- MODAL 1: CROPPER -->
+    <!-- MODAL 1: CROPPER ORIGINAL COM NIVELAMENTO E ROTAÇÃO -->
     <div id="modalCropperScanner" class="fixed inset-0 bg-gray-950 z-[60] hidden flex-col">
         <div class="flex justify-between items-center bg-gray-900 border-b border-gray-800 p-4 shadow-md">
             <h3 class="text-white font-bold text-sm flex items-center gap-2"><i class="fas fa-crop-alt text-blue-500"></i> Ajustar Bordas</h3>
@@ -336,7 +368,7 @@
         </div>
     </div>
 
-    <!-- MODAL 2: APLICADOR DE FILTROS E MÚLTIPLAS CAIXAS -->
+    <!-- MODAL 2: APLICADOR DE FILTROS, CAIXAS DE TEXTO MÚLTIPLAS E ASSINATURA -->
     <div id="modalFiltrosScanner" class="fixed inset-0 bg-gray-950 z-[70] hidden flex-col overflow-y-auto">
         <div class="flex justify-between items-center bg-gray-900 border-b border-gray-800 p-4 shadow-md">
             <button onclick="window.voltarParaCropper()" class="text-gray-400 hover:text-white"><i class="fas fa-arrow-left text-xl"></i></button>
@@ -364,7 +396,7 @@
                 </div>
             </div>
 
-            <!-- FILTROS BASE -->
+            <!-- FILTROS BASE ORIGINAIS -->
             <div class="flex overflow-x-auto gap-3 px-4 custom-scrollbar pb-1 mt-1">
                 <button id="btnFiltro_original" onclick="window.aplicarFiltroBase('original')" class="flex flex-col items-center gap-1.5 min-w-[70px]">
                     <div class="w-10 h-10 bg-gray-800 border-2 border-gray-600 rounded flex items-center justify-center text-gray-400 transition" id="iconFiltro_original"><i class="fas fa-image text-sm"></i></div>
@@ -388,7 +420,7 @@
                 </button>
             </div>
 
-            <!-- CONTROLE DE CAIXAS DE TEXTO -->
+            <!-- CONTROLE DE CAIXAS DE TEXTO MÚLTIPLAS -->
             <div class="px-4 mt-2">
                 <div class="bg-gray-800/60 p-3 rounded-xl border border-gray-700/60 flex flex-col gap-3">
                     <div class="flex justify-between items-center">
@@ -411,15 +443,15 @@
                             </div>
                             <div class="flex items-center gap-2">
                                 <label class="text-[10px] text-gray-400 font-bold uppercase whitespace-nowrap">Tamanho:</label>
-                                <input type="range" id="sliderTamanhoFonte" min="12" max="72" value="24" oninput="window.atualizarTamanhoCaixaAtiva()">
-                                <span id="lblTamanhoFonte" class="text-xs font-bold text-white w-8">24px</span>
+                                <input type="range" id="sliderTamanhoFonte" min="16" max="120" value="36" oninput="window.atualizarTamanhoCaixaAtiva()">
+                                <span id="lblTamanhoFonte" class="text-xs font-bold text-white w-8">36px</span>
                             </div>
                         </div>
 
                         <div class="flex items-center gap-2">
                             <label class="text-[10px] text-gray-400 font-bold uppercase whitespace-nowrap">Largura Caixa:</label>
-                            <input type="range" id="sliderLarguraCaixaTexto" min="100" max="1000" value="400" oninput="window.atualizarLarguraCaixaAtiva()">
-                            <span id="lblLarguraCaixaTexto" class="text-xs font-bold text-white w-10">400px</span>
+                            <input type="range" id="sliderLarguraCaixaTexto" min="150" max="1200" value="500" oninput="window.atualizarLarguraCaixaAtiva()">
+                            <span id="lblLarguraCaixaTexto" class="text-xs font-bold text-white w-10">500px</span>
                         </div>
                     </div>
 
@@ -435,7 +467,7 @@
                     <span class="text-xs font-bold text-indigo-400 flex items-center gap-1.5"><i class="fas fa-pen-nib"></i> Ajustar Assinatura (Arraste no canvas)</span>
                     <div class="flex items-center gap-3">
                         <label class="text-[10px] text-gray-400 font-bold uppercase whitespace-nowrap">Tamanho/Escala:</label>
-                        <input type="range" id="sliderEscalaAssinatura" min="20" max="100" value="50" oninput="window.renderizarFiltroAtual(true)">
+                        <input type="range" id="sliderEscalaAssinatura" min="30" max="200" value="70" oninput="window.renderizarFiltroAtual(true)">
                         <button onclick="window.removerAssinaturaCanvas()" class="text-red-400 hover:text-red-300 text-xs p-1"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>
@@ -470,7 +502,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL E FIREBASE COM PROTEÇÃO CONTRA NULL -->
+    <!-- SCRIPT PRINCIPAL E FIREBASE COM SEGURANÇA CONTRA NULL -->
     <script type="module">
         import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -526,7 +558,6 @@
         let assinandoPad = false;
         let ctxAssinaturaPad = null;
 
-        // HELPER PARA ESCUTAR EVENTOS SEM ERRO DE NULL
         function escutarEventoSeguro(idElemento, evento, callback) {
             const el = document.getElementById(idElemento);
             if (el) el.addEventListener(evento, callback);
@@ -573,8 +604,8 @@
                     modal.classList.remove("flex");
                     modal.classList.add("hidden");
                     window.limparModosUpload();
-                    const elNome = document.getElementById("nomeArquivoManual");
-                    if (elNome) elNome.value = "";
+                    const inNome = document.getElementById("nomeArquivoManual");
+                    if (inNome) inNome.value = "";
                 }, 200);
             }
         };
@@ -677,18 +708,21 @@
             const ctxBruto = canvasCortado.getContext('2d');
             canvasOriginalContextData = ctxBruto.getImageData(0, 0, larguraCrop, alturaCrop);
 
+            // CENTRALIZAÇÃO INICIAL DA CAIXA DE TEXTO E ASSINATURA
+            let larguraCaixaPadrao = Math.min(500, larguraCrop * 0.7);
             caixasTexto = [{
                 id: Date.now(),
                 texto: "",
-                posicao: { x: 40, y: alturaCrop - 150 },
+                posicao: { x: (larguraCrop - larguraCaixaPadrao) / 2, y: (alturaCrop / 2) - 50 },
                 cor: "#000000",
-                tamanhoFonte: 24,
-                larguraCaixa: Math.min(400, larguraCrop - 80),
-                dimensaoCalculada: { w: 400, h: 40 }
+                tamanhoFonte: 36,
+                larguraCaixa: larguraCaixaPadrao,
+                dimensaoCalculada: { w: larguraCaixaPadrao, h: 50 }
             }];
             indiceCaixaTextoAtiva = 0;
 
-            posicaoAssinatura = { x: larguraCrop - 220, y: alturaCrop - 150 };
+            let larguraAssPadrao = larguraCrop * 0.45;
+            posicaoAssinatura = { x: (larguraCrop - larguraAssPadrao) / 2, y: (alturaCrop / 2) + 50 };
             imgAssinaturaElemento = null;
             
             const slB = document.getElementById("sliderBrilho"); if (slB) slB.value = 0;
@@ -703,7 +737,7 @@
             const slLarg = document.getElementById("sliderLarguraCaixaTexto");
             if (slLarg) {
                 slLarg.max = larguraCrop;
-                slLarg.value = Math.min(400, larguraCrop - 80);
+                slLarg.value = larguraCaixaPadrao;
             }
 
             const modalCrop = document.getElementById("modalCropperScanner");
@@ -754,14 +788,15 @@
         };
 
         window.adicionarNovaCaixaTexto = function() {
+            let larguraCaixaPadrao = Math.min(400, larguraCrop * 0.7);
             const novaCaixa = {
                 id: Date.now(),
                 texto: "Novo Texto",
-                posicao: { x: 40, y: 60 + (caixasTexto.length * 30) },
+                posicao: { x: (larguraCrop - larguraCaixaPadrao) / 2, y: 100 + (caixasTexto.length * 40) },
                 cor: "#000000",
-                tamanhoFonte: 24,
-                larguraCaixa: Math.min(300, larguraCrop - 80),
-                dimensaoCalculada: { w: 300, h: 40 }
+                tamanhoFonte: 36,
+                larguraCaixa: larguraCaixaPadrao,
+                dimensaoCalculada: { w: larguraCaixaPadrao, h: 50 }
             };
             caixasTexto.push(novaCaixa);
             indiceCaixaTextoAtiva = caixasTexto.length - 1;
@@ -966,8 +1001,8 @@
             // 4. Renderiza Assinatura
             if (imgAssinaturaElemento) {
                 const slEsc = document.getElementById("sliderEscalaAssinatura");
-                let escala = slEsc ? parseInt(slEsc.value) / 100 : 0.5;
-                let larguraAss = (larguraCrop * 0.35) * escala;
+                let escala = slEsc ? parseInt(slEsc.value) / 100 : 0.7;
+                let larguraAss = (larguraCrop * 0.45) * escala;
                 let alturaAss = (imgAssinaturaElemento.height * larguraAss) / imgAssinaturaElemento.width;
                 ctxLive.drawImage(imgAssinaturaElemento, posicaoAssinatura.x, posicaoAssinatura.y, larguraAss, alturaAss);
             }
@@ -991,8 +1026,8 @@
                 
                 if (imgAssinaturaElemento) {
                     const slEsc = document.getElementById("sliderEscalaAssinatura");
-                    let escala = slEsc ? parseInt(slEsc.value) / 100 : 0.5;
-                    let larguraAss = (larguraCrop * 0.35) * escala;
+                    let escala = slEsc ? parseInt(slEsc.value) / 100 : 0.7;
+                    let larguraAss = (larguraCrop * 0.45) * escala;
                     let alturaAss = (imgAssinaturaElemento.height * larguraAss) / imgAssinaturaElemento.width;
                     
                     if (pos.x >= posicaoAssinatura.x && pos.x <= posicaoAssinatura.x + larguraAss &&
@@ -1128,7 +1163,26 @@
             if (!canvasLive) return;
             const imgSalvaDataUrl = canvasLive.toDataURL('image/jpeg', 0.85); 
 
-            arrayPaginasEscaneadas.push(imgSalvaDataUrl);
+            const estadoPagina = {
+                imagemBaseContextData: canvasOriginalContextData,
+                larguraCrop: larguraCrop,
+                alturaCrop: alturaCrop,
+                caixasTexto: JSON.parse(JSON.stringify(caixasTexto)),
+                indiceCaixaTextoAtiva: indiceCaixaTextoAtiva,
+                posicaoAssinatura: { ...posicaoAssinatura },
+                imgAssinaturaElemento: imgAssinaturaElemento,
+                escalaAssinatura: document.getElementById("sliderEscalaAssinatura") ? document.getElementById("sliderEscalaAssinatura").value : 70,
+                brilho: document.getElementById("sliderBrilho") ? document.getElementById("sliderBrilho").value : 0,
+                contraste: document.getElementById("sliderContraste") ? document.getElementById("sliderContraste").value : 0,
+                finalDataUrl: imgSalvaDataUrl
+            };
+
+            if (indicePaginaSendoEditada !== null) {
+                arrayPaginasEscaneadas[indicePaginaSendoEditada] = estadoPagina;
+            } else {
+                arrayPaginasEscaneadas.push(estadoPagina);
+            }
+
             modoUploadAtual = 'scanner';
 
             const modalFiltros = document.getElementById("modalFiltrosScanner");
@@ -1137,6 +1191,7 @@
             window.renderizarCarrinhoScanner();
         };
 
+        // CARRINHO DE PÁGINAS ESCANEADAS COM ÍCONE DE EDITAR (LÁPIS)
         window.renderizarCarrinhoScanner = function() {
             const areaEscolha = document.getElementById("areaEscolhaModo");
             const areaPrev = document.getElementById("areaPreviewScanner");
@@ -1161,12 +1216,53 @@
                     <div class="absolute bottom-0 left-0 right-0 bg-black/80 text-[9px] text-center py-1 font-bold shadow-inner">Pág ${index + 1}</div>
                     
                     <div class="absolute top-1 right-1 flex gap-1">
-                        <button onclick="window.removerPaginaScanner(${index})" class="bg-red-600 hover:bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-lg"><i class="fas fa-times text-[9px]"></i></button>
+                        <button onclick="window.reabrirEdicaoPagina(${index})" title="Editar Página" class="bg-blue-600 hover:bg-blue-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-lg"><i class="fas fa-pen text-[9px]"></i></button>
+                        <button onclick="window.removerPaginaScanner(${index})" title="Remover Página" class="bg-red-600 hover:bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-lg"><i class="fas fa-times text-[9px]"></i></button>
                     </div>
                 `;
                 if (grid) grid.appendChild(div);
             });
             if (arrayPaginasEscaneadas.length === 0) window.limparModosUpload();
+        };
+
+        window.reabrirEdicaoPagina = function(index) {
+            indicePaginaSendoEditada = index;
+            const pag = arrayPaginasEscaneadas[index];
+
+            if (typeof pag === 'string') return;
+
+            canvasOriginalContextData = pag.imagemBaseContextData;
+            larguraCrop = pag.larguraCrop;
+            alturaCrop = pag.alturaCrop;
+            caixasTexto = JSON.parse(JSON.stringify(pag.caixasTexto));
+            indiceCaixaTextoAtiva = pag.indiceCaixaTextoAtiva;
+            posicaoAssinatura = { ...pag.posicaoAssinatura };
+            imgAssinaturaElemento = pag.imgAssinaturaElemento;
+
+            const slEsc = document.getElementById("sliderEscalaAssinatura"); if (slEsc) slEsc.value = pag.escalaAssinatura;
+            const slB = document.getElementById("sliderBrilho"); if (slB) slB.value = pag.brilho;
+            const slC = document.getElementById("sliderContraste"); if (slC) slC.value = pag.contraste;
+
+            if (imgAssinaturaElemento) {
+                const pAss = document.getElementById("painelControleAssinatura"); if (pAss) { pAss.classList.remove("hidden"); pAss.classList.add("flex"); }
+                const txtBtn = document.getElementById("txtBtnAssinatura"); if (txtBtn) txtBtn.innerText = "Refazer Assinatura";
+            } else {
+                const pAss = document.getElementById("painelControleAssinatura"); if (pAss) { pAss.classList.add("hidden"); pAss.classList.remove("flex"); }
+                const txtBtn = document.getElementById("txtBtnAssinatura"); if (txtBtn) txtBtn.innerText = "Adicionar Assinatura";
+            }
+
+            const modalFiltros = document.getElementById("modalFiltrosScanner");
+            if (modalFiltros) { modalFiltros.classList.remove("hidden"); modalFiltros.classList.add("flex"); }
+
+            const canvasLive = document.getElementById("canvasLivePreview");
+            if (canvasLive) {
+                canvasLive.width = larguraCrop;
+                canvasLive.height = alturaCrop;
+                configurarEventosArrastoCanvas(canvasLive);
+            }
+
+            sincronizarPainelComCaixaAtiva();
+            window.renderizarFiltroAtual(true);
         };
 
         window.removerPaginaScanner = function(index) {
@@ -1697,7 +1793,7 @@
             }
         });
 
-        // DISPARADORES SEGUROS
+        // DISPARADORES SEGUROS CONTRA NULL
         escutarEventoSeguro("inputBuscaAnexo", "input", window.aplicarFiltrosNaGaleria);
         escutarEventoSeguro("dataInicioFiltro", "change", window.aplicarFiltrosNaGaleria);
         escutarEventoSeguro("dataFimFiltro", "change", window.aplicarFiltrosNaGaleria);
