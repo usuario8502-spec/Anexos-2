@@ -123,12 +123,12 @@
                     <i class="fas fa-user-lock"></i>
                 </div>
                 <h2 class="text-lg font-bold text-white">Acessar o Sistema</h2>
-                <p class="text-xs text-gray-400">Digite seu usuário ou e-mail e senha para continuar.</p>
+                <p class="text-xs text-gray-400">Digite seu usuário e senha para continuar.</p>
             </div>
 
             <form id="formLogin" onsubmit="window.executarLoginFirebase(event)" class="flex flex-col gap-3">
                 <div class="flex flex-col gap-1">
-                    <label class="text-[10px] text-gray-400 font-bold uppercase">Usuário ou E-mail</label>
+                    <label class="text-[10px] text-gray-400 font-bold uppercase">Usuário</label>
                     <input type="text" id="loginUsuario" required placeholder="Digite seu usuário..." class="p-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-xs focus:outline-none focus:border-blue-500">
                 </div>
                 <div class="flex flex-col gap-1">
@@ -151,10 +151,10 @@
                 <i class="fas fa-key"></i>
             </div>
             <h3 class="text-sm font-bold text-white">Recuperar Senha</h3>
-            <p class="text-xs text-gray-400">Digite seu nome de usuário ou e-mail cadastrado para receber o link de redefinição.</p>
+            <p class="text-xs text-gray-400">Digite seu nome de usuário. O sistema localizará seu e-mail e enviará o link de redefinição.</p>
             
             <form onsubmit="window.confirmarRecuperacaoSenha(event)" class="flex flex-col gap-3">
-                <input type="text" id="recUsuario" required placeholder="Digite o usuário ou e-mail..." class="p-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-xs focus:outline-none focus:border-blue-500">
+                <input type="text" id="recUsuario" required placeholder="Digite o nome de usuário..." class="p-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-xs focus:outline-none focus:border-blue-500">
                 <div class="flex gap-2">
                     <button type="button" onclick="window.fecharModalRecuperarSenha()" class="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 py-2.5 rounded-xl text-xs font-bold border border-gray-700 transition">Cancelar</button>
                     <button type="submit" id="btnEnviarRecuperacao" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-2.5 rounded-xl text-xs font-bold transition">Enviar Link</button>
@@ -229,7 +229,7 @@
         </div>
     </aside>
 
-    <!-- Cabeçalho Limpo -->
+    <!-- Cabeçalho -->
     <header class="bg-gray-900 border-b border-gray-800 p-4 sticky top-0 z-40 shadow-md">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <button onclick="window.toggleSidebar && window.toggleSidebar(true)" class="text-gray-300 hover:text-white text-xl p-2 bg-gray-800 hover:bg-gray-700 rounded-lg border border-gray-700 focus:outline-none w-10 h-10 flex items-center justify-center">
@@ -559,14 +559,13 @@
         </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL E FIREBASE -->
+    <!-- SCRIPT PRINCIPAL E FIREBASE COM BUSCA RESTRITA POR USERNAME -->
     <script type="module">
         import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getDatabase, ref as dbRef, push, onValue, update, remove, set, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
         import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
-        // CREDENCIAIS DO FIREBASE (PROJETO: anexos-2)
         const firebaseConfig = {
             apiKey: "AIzaSyCQ8--X39oK3BnwNES7zDklKnWP0_4hEas",
             authDomain: "anexos-2.firebaseapp.com",
@@ -620,53 +619,51 @@
             if (el) el.addEventListener(evento, callback);
         }
 
-        // LOGIN EXCLUSIVO VIA FIREBASE AUTH
+        // LOGIN RECONHECENDO ESTRITAMENTE O USERNAME NO BANCO DE DADOS
         window.executarLoginFirebase = async function(e) {
             e.preventDefault();
-            const usuarioOuEmail = document.getElementById("loginUsuario")?.value.trim();
+            const usernameDigitado = document.getElementById("loginUsuario")?.value.trim();
             const senha = document.getElementById("loginSenha")?.value.trim();
             const btn = document.getElementById("btnEntrarLogin");
 
-            if (!usuarioOuEmail || !senha) return alert("Preencha usuário e senha.");
+            if (!usernameDigitado || !senha) return alert("⚠️ Digite seu usuário e senha.");
             if (btn) btn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Entrando...`;
 
-            let emailFinal = usuarioOuEmail;
-            if (!usuarioOuEmail.includes("@")) {
-                try {
-                    const dbSnap = await get(dbRef(db, 'usuarios_sistema'));
-                    if (dbSnap.exists()) {
-                        const lista = dbSnap.val();
-                        let encontrado = false;
-                        for (let key in lista) {
-                            if (lista[key].username && lista[key].username.toLowerCase() === usuarioOuEmail.toLowerCase()) {
-                                if (lista[key].email) {
-                                    emailFinal = lista[key].email;
-                                    encontrado = true;
-                                    break;
-                                }
-                            }
+            let emailVinculado = null;
+
+            try {
+                const dbSnap = await get(dbRef(db, 'usuarios_sistema'));
+                if (dbSnap.exists()) {
+                    const lista = dbSnap.val();
+                    for (let key in lista) {
+                        if (lista[key].username && lista[key].username.toLowerCase() === usernameDigitado.toLowerCase()) {
+                            emailVinculado = lista[key].email;
+                            break;
                         }
-                        if (!encontrado) emailFinal = `${usuarioOuEmail}@anexos.com`;
-                    } else {
-                        emailFinal = `${usuarioOuEmail}@anexos.com`;
                     }
-                } catch (err) {
-                    emailFinal = `${usuarioOuEmail}@anexos.com`;
                 }
+            } catch (err) {
+                console.error("Erro na busca de usuário:", err);
             }
 
-            signInWithEmailAndPassword(auth, emailFinal, senha)
+            if (!emailVinculado) {
+                alert("❌ Usuário não encontrado no sistema.");
+                if (btn) btn.innerText = "Entrar";
+                return;
+            }
+
+            signInWithEmailAndPassword(auth, emailVinculado, senha)
                 .then(() => {
                     const modalLogin = document.getElementById("modalLoginApp");
                     if (modalLogin) modalLogin.classList.add("hidden");
                 })
                 .catch((error) => {
-                    alert("Erro ao entrar: Usuário ou senha incorretos.");
+                    alert("❌ Senha incorreta.");
                     if (btn) btn.innerText = "Entrar";
                 });
         };
 
-        // POP-UP E RECUPERAÇÃO DE SENHA POR USUÁRIO (BUSCA AUTOMÁTICA DO E-MAIL)
+        // RECUPERAÇÃO DE SENHA BUSCANDO O E-MAIL PELO USERNAME DIGITADO NO POP-UP
         window.abrirModalRecuperarSenha = function() {
             const modal = document.getElementById("modalRecuperarSenha");
             if (modal) { modal.classList.remove("hidden"); modal.classList.add("flex"); }
@@ -685,37 +682,39 @@
             const btn = document.getElementById("btnEnviarRecuperacao");
             if (btn) btn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Buscando...`;
 
-            let emailEnvio = usernameInput;
-            if (!usernameInput.includes("@")) {
-                try {
-                    const dbSnap = await get(dbRef(db, 'usuarios_sistema'));
-                    if (dbSnap.exists()) {
-                        const lista = dbSnap.val();
-                        for (let key in lista) {
-                            if (lista[key].username && lista[key].username.toLowerCase() === usernameInput.toLowerCase()) {
-                                if (lista[key].email) {
-                                    emailEnvio = lista[key].email;
-                                    break;
-                                }
-                            }
+            let emailEncontrado = null;
+            try {
+                const dbSnap = await get(dbRef(db, 'usuarios_sistema'));
+                if (dbSnap.exists()) {
+                    const lista = dbSnap.val();
+                    for (let key in lista) {
+                        if (lista[key].username && lista[key].username.toLowerCase() === usernameInput.toLowerCase()) {
+                            emailEncontrado = lista[key].email;
+                            break;
                         }
                     }
-                } catch (err) {}
+                }
+            } catch (err) {}
+
+            if (!emailEncontrado) {
+                alert(`❌ Nenhum usuário com o nome "${usernameInput}" foi encontrado.`);
+                if (btn) btn.innerText = "Enviar Link";
+                return;
             }
 
-            sendPasswordResetEmail(auth, emailEnvio)
+            sendPasswordResetEmail(auth, emailEncontrado)
                 .then(() => {
-                    alert(`📧 Um e-mail com o link de redefinição de senha foi enviado para a conta associada ao usuário "${usernameInput}". Verifique sua caixa de entrada.`);
+                    alert(`📧 O link de redefinição de senha foi enviado para o e-mail cadastrado do usuário "${usernameInput}". Verifique sua caixa de entrada.`);
                     window.fecharModalRecuperarSenha();
                     if (btn) btn.innerText = "Enviar Link";
                 })
                 .catch((error) => {
-                    alert("Erro ao solicitar redefinição: " + error.message);
+                    alert("Erro ao enviar e-mail: " + error.message);
                     if (btn) btn.innerText = "Enviar Link";
                 });
         };
 
-        // MODAL E CADASTRO EXCLUSIVO PARA O ADMINISTRADOR
+        // CADASTRO EXCLUSIVO PELO ADMIN
         window.abrirModalCadastroUsuario = function() {
             const modal = document.getElementById("modalCadastroUsuario");
             if (modal) { modal.classList.remove("hidden"); modal.classList.add("flex"); }
@@ -1135,8 +1134,10 @@
                 if (lblL) lblL.innerText = caixasTexto[indiceCaixaTextoAtiva].larguraCaixa + "px";
             }
 
+            // 1. Imagem Base
             ctxLive.putImageData(canvasOriginalContextData, 0, 0);
             
+            // 2. Filtros
             if (window.filtroAtivo !== 'original' || valBrilho !== 0 || valContraste !== 0) {
                 const imgData = ctxLive.getImageData(0, 0, larguraCrop, alturaCrop);
                 const data = imgData.data;
@@ -1176,6 +1177,7 @@
                 ctxLive.putImageData(imgData, 0, 0);
             }
 
+            // 3. Renderiza Caixas de Texto
             caixasTexto.forEach((caixa, index) => {
                 if (caixa.texto.trim() !== "") {
                     caixa.dimensaoCalculada = desenharTextoEstiloDocumentoAutoAjustavel(
@@ -1193,6 +1195,7 @@
                 }
             });
 
+            // 4. Renderiza Assinatura
             if (imgAssinaturaElemento) {
                 const slEsc = document.getElementById("sliderEscalaAssinatura");
                 let escala = slEsc ? parseInt(slEsc.value) / 100 : 0.7;
