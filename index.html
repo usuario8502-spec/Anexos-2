@@ -559,10 +559,10 @@
         </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL E FIREBASE COM CORREÇÃO DE BUSCA E CONTINGÊNCIA -->
+    <!-- SCRIPT PRINCIPAL E FIREBASE COM AUTO-LOGOUT DE 8 MIN E SESSÃO POR ABA -->
     <script type="module">
         import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, setPersistence, browserSessionPersistence, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getDatabase, ref as dbRef, push, onValue, update, remove, set, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
         import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
@@ -581,6 +581,30 @@
         const auth = getAuth(app);
         const db = getDatabase(app);
         const storage = getStorage(app);
+
+        // PERSISTÊNCIA DA SESSÃO: EXIGE LOGIN SEMPRE QUE A ABA OU O APP FOR FECHADO
+        setPersistence(auth, browserSessionPersistence).catch((err) => {
+            console.warn("Aviso ao configurar persistência de sessão:", err);
+        });
+
+        // REGRAS DE AUTO LOGOUT POR INATIVIDADE DE 8 MINUTOS (480.000 ms)
+        let timerInatividade = null;
+        const TEMPO_INATIVIDADE_MS = 8 * 60 * 1000;
+
+        function resetarTimerInatividade() {
+            if (timerInatividade) clearTimeout(timerInatividade);
+            if (auth.currentUser) {
+                timerInatividade = setTimeout(() => {
+                    alert("⏰ Sessão expirada devido a 8 minutos de inatividade. Por favor, faça login novamente.");
+                    window.fazerLogout();
+                }, TEMPO_INATIVIDADE_MS);
+            }
+        }
+
+        // EVENTOS PARA IDENTIFICAR INTERAÇÃO DO USUÁRIO
+        ['mousemove', 'mousedown', 'keypress', 'touchstart', 'scroll', 'click'].forEach(evt => {
+            window.addEventListener(evt, resetarTimerInatividade, true);
+        });
 
         let usuarioLogado = "Operador";
         let perfilUsuario = "operador";
@@ -632,7 +656,6 @@
 
             let emailVinculado = null;
 
-            // BUSCA O E-MAIL DO USUÁRIO NO BANCO DE DADOS
             try {
                 const dbSnap = await get(dbRef(db, 'usuarios_sistema'));
                 if (dbSnap.exists()) {
@@ -647,10 +670,9 @@
                     }
                 }
             } catch (err) {
-                console.warn("Aviso de leitura no banco. Tentando formato padrão de e-mail:", err);
+                console.warn("Aviso de leitura no banco:", err);
             }
 
-            // SE NÃO ACHOU O E-MAIL NO BANCO, TESTA A ESTRUTURA DIRETA SE TIVER O ARROBA OU O DOMÍNIO PADRÃO
             if (!emailVinculado) {
                 if (usernameDigitado.includes("@")) {
                     emailVinculado = usernameDigitado;
@@ -663,6 +685,7 @@
                 .then(() => {
                     const modalLogin = document.getElementById("modalLoginApp");
                     if (modalLogin) modalLogin.classList.add("hidden");
+                    resetarTimerInatividade();
                 })
                 .catch((error) => {
                     alert("❌ Usuário ou senha incorretos.");
@@ -780,6 +803,7 @@
         };
 
         window.fazerLogout = function() {
+            if (timerInatividade) clearTimeout(timerInatividade);
             signOut(auth).then(() => {
                 const modalLogin = document.getElementById("modalLoginApp");
                 if (modalLogin) modalLogin.classList.remove("hidden");
@@ -1938,6 +1962,7 @@
             if (user) {
                 if (modalLogin) modalLogin.classList.add("hidden");
                 uidUsuarioLogado = user.uid;
+                resetarTimerInatividade();
                 const fallbackUsername = user.email.split('@')[0];
 
                 onValue(dbRef(db, 'usuarios_sistema/' + user.uid), (snap) => {
