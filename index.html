@@ -115,7 +115,7 @@
 </head>
 <body class="bg-gray-950 text-gray-100 font-sans min-h-screen flex flex-col relative pb-24">
 
-    <!-- MODAL DE LOGIN EMBUTIDO (USUÁRIO E SENHA) -->
+    <!-- MODAL DE LOGIN EMBUTIDO -->
     <div id="modalLoginApp" class="fixed inset-0 bg-black/95 popup-blur z-[100] flex items-center justify-center p-4">
         <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-sm shadow-2xl flex flex-col gap-4">
             <div class="text-center flex flex-col items-center gap-2">
@@ -123,21 +123,21 @@
                     <i class="fas fa-user-lock"></i>
                 </div>
                 <h2 class="text-lg font-bold text-white">Acessar o Sistema</h2>
-                <p class="text-xs text-gray-400">Digite seu usuário e senha. (Teste: admin / admin123)</p>
+                <p class="text-xs text-gray-400">Digite seu usuário ou e-mail e senha para continuar.</p>
             </div>
 
             <!-- FORMULÁRIO DE LOGIN -->
             <form id="formLogin" onsubmit="window.executarLoginFirebase(event)" class="flex flex-col gap-3">
                 <div class="flex flex-col gap-1">
                     <label class="text-[10px] text-gray-400 font-bold uppercase">Usuário</label>
-                    <input type="text" id="loginUsuario" required placeholder="Digite seu usuário..." class="p-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-xs focus:outline-none focus:border-blue-500">
+                    <input type="text" id="loginUsuario" required placeholder="Digite seu usuário ou e-mail..." class="p-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-xs focus:outline-none focus:border-blue-500">
                 </div>
                 <div class="flex flex-col gap-1">
-                    <div class="flex justify-between items-center">
-                        <label class="text-[10px] text-gray-400 font-bold uppercase">Senha</label>
-                        <button type="button" onclick="window.executarRecuperacaoSenhaFirebase()" class="text-[10px] text-blue-400 hover:underline font-semibold">Esqueceu?</button>
-                    </div>
+                    <label class="text-[10px] text-gray-400 font-bold uppercase">Senha</label>
                     <input type="password" id="loginSenha" required placeholder="******" class="p-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-xs focus:outline-none focus:border-blue-500">
+                    <div class="flex justify-end pt-1">
+                        <button type="button" onclick="window.executarRecuperacaoSenhaFirebase()" class="text-[10px] text-blue-400 hover:underline font-semibold">Esqueceu a senha?</button>
+                    </div>
                 </div>
 
                 <div class="flex gap-2 mt-2">
@@ -146,7 +146,7 @@
                 </div>
             </form>
 
-            <!-- FORMULÁRIO DE CADASTRO (COM SELETOR DE PODERES/PERFIL) -->
+            <!-- FORMULÁRIO DE CADASTRO -->
             <form id="formCadastro" onsubmit="window.executarCadastroFirebase(event)" class="hidden flex-col gap-3">
                 <div class="flex flex-col gap-1">
                     <label class="text-[10px] text-gray-400 font-bold uppercase">Nome de Usuário (Username)</label>
@@ -199,21 +199,14 @@
         </div>
     </aside>
 
-    <!-- Cabeçalho -->
+    <!-- Cabeçalho Limpo (Sem Ícone de Sino) -->
     <header class="bg-gray-900 border-b border-gray-800 p-4 sticky top-0 z-40 shadow-md">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <button onclick="window.toggleSidebar && window.toggleSidebar(true)" class="text-gray-300 hover:text-white text-xl p-2 bg-gray-800 hover:bg-gray-700 rounded-lg border border-gray-700 focus:outline-none w-10 h-10 flex items-center justify-center">
                 <i class="fas fa-bars"></i>
             </button> 
             <h1 class="text-xl sm:text-2xl font-bold text-blue-500 tracking-wide text-center flex-1">Anexos</h1>
-            
-            <div id="areaSinoAdmin" class="hidden relative">
-                <button onclick="window.abrirModalNotificacoes()" class="text-gray-300 hover:text-white text-xl p-2 bg-gray-800 hover:bg-gray-700 rounded-lg border border-gray-700 focus:outline-none w-10 h-10 flex items-center justify-center relative transition">
-                    <i class="fas fa-bell"></i>
-                    <span id="badgeNotificacoes" class="hidden absolute -top-1.5 -right-1.5 bg-red-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-gray-900 shadow-md">0</span>
-                </button>
-            </div>
-            <div id="espacadorHeader" class="w-10"></div>
+            <div class="w-10"></div>
         </div>
     </header>
 
@@ -257,21 +250,6 @@
     <button onclick="window.abrirModalUpload()" class="fixed bottom-6 right-6 w-16 h-16 bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-[0_0_20px_rgba(37,99,235,0.5)] flex items-center justify-center text-2xl transition-transform hover:scale-105 z-40 focus:outline-none">
         <i class="fas fa-plus"></i>
     </button>
-
-    <!-- MODAL DO SINO DE NOTIFICAÇÕES -->
-    <div id="modalNotificacoes" class="fixed inset-0 bg-black/80 popup-blur hidden items-center justify-center p-4 z-50">
-        <div class="bg-gray-900 rounded-xl border border-gray-800 p-6 w-full max-w-lg shadow-2xl flex flex-col gap-4 transform transition-all scale-95 opacity-0" id="modalNotificacoesContent">
-            <div class="flex justify-between items-center border-b border-gray-800 pb-3">
-                <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                    <i class="fas fa-bell text-yellow-400"></i> Solicitações de Exclusão
-                </h3>
-                <button onclick="window.fecharModalNotificacoes()" class="text-gray-500 hover:text-white transition text-xl"><i class="fas fa-times"></i></button>
-            </div>
-            <div id="containerNotificacoes" class="flex flex-col gap-3 max-h-80 overflow-y-auto custom-scrollbar">
-                <div class="p-6 text-center text-gray-600 text-xs">Carregando solicitações...</div>
-            </div>
-        </div>
-    </div>
 
     <!-- MODAL DE VISUALIZAÇÃO E EDIÇÃO DO ANEXO -->
     <div id="modalVisualizacao" class="fixed inset-0 bg-black/90 popup-blur hidden items-center justify-center p-4 z-50">
@@ -555,9 +533,10 @@
     <script type="module">
         import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getDatabase, ref as dbRef, push, onValue, update, remove, set, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref as dbRef, push, onValue, update, remove, set, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
         import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
+        // CREDENCIAIS DO FIREBASE (PROJETO: anexos-2)
         const firebaseConfig = {
             apiKey: "AIzaSyCQ8--X39oK3BnwNES7zDklKnWP0_4hEas",
             authDomain: "anexos-2.firebaseapp.com",
@@ -624,7 +603,7 @@
             }
         };
 
-        // LOGIN POR USUÁRIO (USERNAME) OU E-MAIL + SUPORTE A ADMIN FICTÍCIO
+        // LOGIN EXCLUSIVO POR FIREBASE AUTH (SUPORTE A USERNAME E E-MAIL)
         window.executarLoginFirebase = async function(e) {
             e.preventDefault();
             const usuarioOuEmail = document.getElementById("loginUsuario")?.value.trim();
@@ -634,27 +613,6 @@
             if (!usuarioOuEmail || !senha) return alert("Preencha usuário e senha.");
             if (btn) btn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Entrando...`;
 
-            // LOGIN ADMIN FICTÍCIO LOCAL PARA TESTE RÁPIDO
-            if (usuarioOuEmail === "admin" && senha === "admin123") {
-                usuarioLogado = "admin";
-                perfilUsuario = "administrador";
-                const modalLogin = document.getElementById("modalLoginApp");
-                if (modalLogin) modalLogin.classList.add("hidden");
-
-                const elSidebarNome = document.getElementById("sidebarNomeUsuario");
-                const elSidebarPerfil = document.getElementById("sidebarPerfilUsuario");
-                if (elSidebarNome) elSidebarNome.innerText = "@admin";
-                if (elSidebarPerfil) elSidebarPerfil.innerText = "administrador";
-
-                const areaSino = document.getElementById("areaSinoAdmin");
-                if (areaSino) areaSino.classList.remove("hidden");
-                
-                carregarGaleriaDeAnexos();
-                if (btn) btn.innerText = "Entrar";
-                return;
-            }
-
-            // BUSCA DO E-MAIL CORRESPONDENTE SE O USUÁRIO DIGITOU APENAS O USERNAME
             let emailFinal = usuarioOuEmail;
             if (!usuarioOuEmail.includes("@")) {
                 try {
@@ -680,7 +638,6 @@
                 }
             }
 
-            // AUTENTICAÇÃO NO FIREBASE
             signInWithEmailAndPassword(auth, emailFinal, senha)
                 .then(() => {
                     const modalLogin = document.getElementById("modalLoginApp");
@@ -692,7 +649,7 @@
                 });
         };
 
-        // CADASTRO COM USUÁRIO, E-MAIL, SENHA E PODERES (SELETOR DE PERFIL)
+        // CADASTRO COM SELETOR DE PERFIL/PODERES
         window.executarCadastroFirebase = function(e) {
             if (e) e.preventDefault();
             const username = document.getElementById("cadUsuario")?.value.trim();
@@ -726,17 +683,34 @@
                 });
         };
 
-        window.executarRecuperacaoSenhaFirebase = function() {
+        // RECUPERAÇÃO DE SENHA FIREBASE
+        window.executarRecuperacaoSenhaFirebase = async function() {
             const usuarioOuEmail = document.getElementById("loginUsuario")?.value.trim();
             if (!usuarioOuEmail) {
-                return alert("⚠️ Por favor, digite seu usuário ou e-mail no campo 'Usuário' para receber o e-mail de redefinição.");
+                return alert("⚠️ Por favor, digite seu usuário ou e-mail no campo 'Usuário' acima para receber o link de redefinição.");
             }
 
-            let emailEnvio = usuarioOuEmail.includes("@") ? usuarioOuEmail : `${usuarioOuEmail}@anexos.com`;
+            let emailEnvio = usuarioOuEmail;
+            if (!usuarioOuEmail.includes("@")) {
+                try {
+                    const dbSnap = await get(dbRef(db, 'usuarios_sistema'));
+                    if (dbSnap.exists()) {
+                        const lista = dbSnap.val();
+                        for (let key in lista) {
+                            if (lista[key].username && lista[key].username.toLowerCase() === usuarioOuEmail.toLowerCase()) {
+                                if (lista[key].email) {
+                                    emailEnvio = lista[key].email;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                } catch (err) {}
+            }
 
             sendPasswordResetEmail(auth, emailEnvio)
                 .then(() => {
-                    alert("📧 E-mail de redefinição de senha enviado! Verifique sua caixa de entrada.");
+                    alert("📧 E-mail de redefinição de senha enviado com sucesso! Verifique sua caixa de entrada.");
                 })
                 .catch((error) => {
                     alert("Erro ao solicitar redefinição: " + error.message);
@@ -1770,7 +1744,6 @@
                     const dataObj = new Date(arq.dataEnvio);
                     const dataFormatada = isBuscaAtiva ? dataObj.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit'}) : dataObj.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
                     const nomeSeguro = arq.nome.replace(/'/g, "\\'").replace(/"/g, "&quot;");
-                    const badgePendente = (perfilUsuario === "administrador" && arq.statusExclusao === "pendente_aprovacao") ? `<span class="bg-red-900/80 text-red-300 text-[9px] font-bold px-1.5 py-0.5 rounded border border-red-700 ml-auto">Pendente Exclusão</span>` : "";
 
                     let visualConteudo = renderizarVisualArquivo(arq.tipo.toLowerCase(), arq.url);
 
@@ -1778,7 +1751,7 @@
                     card.className = "bg-gray-900 border border-gray-800 p-3 rounded-xl shadow flex gap-3 items-center hover:border-blue-500/30 transition cursor-pointer active:scale-95";
                     card.setAttribute("onclick", `window.abrirModalVisualizacao('${arq.id}', '${arq.url}', '${nomeSeguro}', '${arq.tipo}')`);
                     
-                    card.innerHTML = `${visualConteudo}<div class="flex-1 min-w-0"><div class="flex items-center gap-1"><h4 class="font-bold text-white text-sm truncate uppercase flex-1">${arq.nome}</h4>${badgePendente}</div><p class="text-[10px] text-gray-400 mt-0.5"><i class="fas fa-user text-blue-500"></i> @${arq.enviadoPor}</p><p class="text-[10px] text-gray-500"><i class="far fa-clock"></i> ${dataFormatada} <span class="uppercase text-[8px] bg-gray-800 px-1 py-0.5 rounded ml-1 border border-gray-700">${arq.tipo}</span></p></div>`;
+                    card.innerHTML = `${visualConteudo}<div class="flex-1 min-w-0"><div class="flex items-center gap-1"><h4 class="font-bold text-white text-sm truncate uppercase flex-1">${arq.nome}</h4></div><p class="text-[10px] text-gray-400 mt-0.5"><i class="fas fa-user text-blue-500"></i> @${arq.enviadoPor}</p><p class="text-[10px] text-gray-500"><i class="far fa-clock"></i> ${dataFormatada} <span class="uppercase text-[8px] bg-gray-800 px-1 py-0.5 rounded ml-1 border border-gray-700">${arq.tipo}</span></p></div>`;
                     container.appendChild(card);
                 });
 
@@ -1788,13 +1761,10 @@
 
         function renderizarCardPasta(container, nomePasta, arquivosDaPasta, onclickAction) {
             const qtd = arquivosDaPasta.length;
-            const pendentesCount = arquivosDaPasta.filter(a => a.statusExclusao === 'pendente_aprovacao').length;
-            let badgeHTML = "";
-            if(perfilUsuario === 'administrador' && pendentesCount > 0){ badgeHTML = `<span class="bg-red-900/80 text-red-300 text-[10px] font-bold px-2 py-0.5 rounded border border-red-700 ml-2 animate-pulse">${pendentesCount} alerta(s)</span>`; }
             const card = document.createElement("div");
             card.className = "bg-gray-800 border border-gray-700 p-4 rounded-xl shadow-md flex items-center gap-4 hover:border-blue-500/50 hover:bg-gray-700/50 transition cursor-pointer active:scale-95";
             card.setAttribute("onclick", onclickAction);
-            card.innerHTML = `<div class="w-14 h-14 bg-blue-900/20 rounded-lg flex items-center justify-center border border-blue-800/40"><i class="fas fa-folder-open text-3xl text-blue-500"></i></div><div class="flex-1 min-w-0"><h4 class="font-bold text-white text-base truncate flex items-center">${nomePasta}</h4><div class="flex items-center mt-1"><p class="text-xs text-gray-400">${qtd} itens salvos</p>${badgeHTML}</div></div><i class="fas fa-chevron-right text-gray-600"></i>`;
+            card.innerHTML = `<div class="w-14 h-14 bg-blue-900/20 rounded-lg flex items-center justify-center border border-blue-800/40"><i class="fas fa-folder-open text-3xl text-blue-500"></i></div><div class="flex-1 min-w-0"><h4 class="font-bold text-white text-base truncate flex items-center">${nomePasta}</h4><div class="flex items-center mt-1"><p class="text-xs text-gray-400">${qtd} itens salvos</p></div></div><i class="fas fa-chevron-right text-gray-600"></i>`;
             container.appendChild(card);
         }
 
@@ -1877,14 +1847,7 @@
             const tCard = document.getElementById("tituloImagemCard");
             const nomeArquivo = tCard ? tCard.innerText : "";
             if (!confirm(`⚠️ Tem certeza de que deseja excluir o anexo "${nomeArquivo}"?`)) return;
-            if (perfilUsuario === "administrador") {
-                remove(dbRef(db, 'arquivos_anexos/' + window.idImagemAtiva)).then(() => { window.fecharModalVisualizacao(); }).catch(err => alert("Erro ao excluir: " + err.message));
-            } else {
-                update(dbRef(db, 'arquivos_anexos/' + window.idImagemAtiva), { statusExclusao: "pendente_aprovacao", solicitadoPor: usuarioLogado }).then(() => {
-                    push(dbRef(db, 'notificacoes_sistema'), { titulo: "Solicitação de Exclusão de Anexo", mensagem: `O usuário @${usuarioLogado} solicitou a exclusão do anexo "${nomeArquivo}".`, tipo: "alerta", usuarioSolicitante: usuarioLogado, enviadoPorUid: uidUsuarioLogado, idAnexo: window.idImagemAtiva, timestamp: Date.now(), data: Date.now() });
-                    window.fecharModalVisualizacao();
-                }).catch(err => alert("Erro ao processar: " + err.message));
-            }
+            remove(dbRef(db, 'arquivos_anexos/' + window.idImagemAtiva)).then(() => { window.fecharModalVisualizacao(); }).catch(err => alert("Erro ao excluir: " + err.message));
         };
 
         window.abrirEdicaoNome = function() {
@@ -1915,16 +1878,6 @@
             });
         };
 
-        window.abrirModalNotificacoes = function() { 
-            const modal = document.getElementById("modalNotificacoes"); const content = document.getElementById("modalNotificacoesContent"); 
-            if (modal && content) { modal.classList.remove("hidden"); modal.classList.add("flex"); setTimeout(() => { content.classList.remove("scale-95", "opacity-0"); content.classList.add("scale-100", "opacity-100"); }, 10); }
-        };
-
-        window.fecharModalNotificacoes = function() { 
-            const modal = document.getElementById("modalNotificacoes"); const content = document.getElementById("modalNotificacoesContent"); 
-            if (modal && content) { content.classList.remove("scale-100", "opacity-100"); content.classList.add("scale-95", "opacity-0"); setTimeout(() => { modal.classList.remove("flex"); modal.classList.add("hidden"); }, 200); }
-        };
-
         // CARREGA GALERIA CONTINUAMENTE
         carregarGaleriaDeAnexos();
 
@@ -1944,27 +1897,12 @@
                     } else {
                         usuarioLogado = fallbackUsername;
                         perfilUsuario = "administrador";
-                        dadosUser = { username: usuarioLogado, perfil: "administrador" };
                     }
 
                     const elSidebarNome = document.getElementById("sidebarNomeUsuario");
                     const elSidebarPerfil = document.getElementById("sidebarPerfilUsuario");
                     if (elSidebarNome) elSidebarNome.innerText = `@${usuarioLogado}`;
                     if (elSidebarPerfil) elSidebarPerfil.innerText = perfilUsuario;
-
-                    const areaSino = document.getElementById("areaSinoAdmin");
-                    const espacador = document.getElementById("espacadorHeader");
-                    
-                    if (perfilUsuario === "administrador") {
-                        if (areaSino) areaSino.classList.remove("hidden");
-                        if (espacador) espacador.classList.add("hidden");
-                        if (typeof window.inicializarNotificacoes === 'function') {
-                            window.inicializarNotificacoes(dadosUser, "containerNotificacoes", "badgeNotificacoes");
-                        }
-                    } else {
-                        if (areaSino) areaSino.classList.add("hidden");
-                        if (espacador) espacador.classList.remove("hidden");
-                    }
                 });
             } else {
                 if (modalLogin) modalLogin.classList.remove("hidden");
@@ -1980,17 +1918,6 @@
         escutarEventoSeguro("dataInicioFiltro", "change", window.aplicarFiltrosNaGaleria);
         escutarEventoSeguro("dataFimFiltro", "change", window.aplicarFiltrosNaGaleria);
         escutarEventoSeguro("filtroUsuario", "change", window.aplicarFiltrosNaGaleria);
-
-        const dispararRenderNotif = () => {
-            if (typeof window.renderizarNotificacoesFiltradas === 'function') {
-                window.renderizarNotificacoesFiltradas("containerNotificacoes", "badgeNotificacoes");
-            }
-        };
-
-        escutarEventoSeguro("inputBuscaNotif", "input", dispararRenderNotif);
-        escutarEventoSeguro("dataInicioFiltroNotif", "change", dispararRenderNotif);
-        escutarEventoSeguro("dataFimFiltroNotif", "change", dispararRenderNotif);
-        escutarEventoSeguro("filtroUsuarioNotif", "change", dispararRenderNotif);
     </script>
 </body>
 </html>
