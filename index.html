@@ -27,18 +27,8 @@
                 theme_color: "#030712",
                 orientation: "portrait",
                 icons: [
-                    {
-                        src: "icon.png",
-                        sizes: "192x192",
-                        type: "image/png",
-                        purpose: "any maskable"
-                    },
-                    {
-                        src: "icon.png",
-                        sizes: "512x512",
-                        type: "image/png",
-                        purpose: "any maskable"
-                    }
+                    { src: "icon.png", sizes: "192x192", type: "image/png", purpose: "any maskable" },
+                    { src: "icon.png", sizes: "512x512", type: "image/png", purpose: "any maskable" }
                 ]
             };
             const stringManifest = JSON.stringify(manifest);
@@ -128,7 +118,7 @@
             <h1 class="text-xl sm:text-2xl font-bold text-blue-500 tracking-wide text-center flex-1">Anexos</h1>
             
             <div id="areaSinoAdmin" class="hidden relative">
-                <button onclick="abrirModalNotificacoes()" class="text-gray-300 hover:text-white text-xl p-2 bg-gray-800 hover:bg-gray-700 rounded-lg border border-gray-700 focus:outline-none w-10 h-10 flex items-center justify-center relative transition">
+                <button onclick="window.abrirModalNotificacoes()" class="text-gray-300 hover:text-white text-xl p-2 bg-gray-800 hover:bg-gray-700 rounded-lg border border-gray-700 focus:outline-none w-10 h-10 flex items-center justify-center relative transition">
                     <i class="fas fa-bell"></i>
                     <span id="badgeNotificacoes" class="hidden absolute -top-1.5 -right-1.5 bg-red-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-gray-900 shadow-md">0</span>
                 </button>
@@ -176,7 +166,7 @@
     </main>
 
     <!-- Botão Flutuante (FAB) -->
-    <button onclick="abrirModalUpload()" class="fixed bottom-6 right-6 w-16 h-16 bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-[0_0_20px_rgba(37,99,235,0.5)] flex items-center justify-center text-2xl transition-transform hover:scale-105 z-40 focus:outline-none">
+    <button onclick="window.abrirModalUpload()" class="fixed bottom-6 right-6 w-16 h-16 bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-[0_0_20px_rgba(37,99,235,0.5)] flex items-center justify-center text-2xl transition-transform hover:scale-105 z-40 focus:outline-none">
         <i class="fas fa-plus"></i>
     </button>
 
@@ -187,7 +177,7 @@
                 <h3 class="text-lg font-bold text-white flex items-center gap-2">
                     <i class="fas fa-bell text-yellow-400"></i> Solicitações de Exclusão
                 </h3>
-                <button onclick="fecharModalNotificacoes()" class="text-gray-500 hover:text-white transition text-xl"><i class="fas fa-times"></i></button>
+                <button onclick="window.fecharModalNotificacoes()" class="text-gray-500 hover:text-white transition text-xl"><i class="fas fa-times"></i></button>
             </div>
             <div id="containerNotificacoes" class="flex flex-col gap-3 max-h-80 overflow-y-auto custom-scrollbar">
                 <div class="p-6 text-center text-gray-600 text-xs">Carregando solicitações...</div>
@@ -201,15 +191,15 @@
             
             <div class="flex justify-between items-start border-b border-gray-800 pb-3 gap-3">
                 <h3 class="text-lg font-bold text-white flex-1 leading-tight break-words" id="tituloImagemCard">Carregando...</h3>
-                <button onclick="fecharModalVisualizacao()" class="text-gray-500 hover:text-white transition text-2xl p-1 leading-none"><i class="fas fa-times"></i></button>
+                <button onclick="window.fecharModalVisualizacao()" class="text-gray-500 hover:text-white transition text-2xl p-1 leading-none"><i class="fas fa-times"></i></button>
             </div>
 
             <div id="areaEdicaoNome" class="hidden flex-col gap-2 bg-gray-800/50 p-3 rounded-lg border border-gray-700">
                 <label class="text-[10px] text-gray-400 font-bold uppercase">Editar Nome do Arquivo</label>
                 <input type="text" id="inputEdicaoNome" class="w-full p-2 rounded-lg bg-gray-900 border border-gray-600 text-white focus:outline-none focus:border-blue-500 text-sm">
                 <div class="flex gap-2 mt-1">
-                    <button id="btnSalvarEdicao" onclick="salvarNovoNome()" class="flex-1 bg-green-600 hover:bg-green-500 text-white py-2 rounded-lg font-bold text-xs transition"><i class="fas fa-save"></i> Salvar</button>
-                    <button onclick="cancelarEdicaoNome()" class="flex-1 bg-red-600/20 hover:bg-red-600/40 text-red-500 py-2 rounded-lg font-bold text-xs transition border border-red-900/50"><i class="fas fa-times"></i> Cancelar</button>
+                    <button id="btnSalvarEdicao" onclick="window.salvarNovoNome()" class="flex-1 bg-green-600 hover:bg-green-500 text-white py-2 rounded-lg font-bold text-xs transition"><i class="fas fa-save"></i> Salvar</button>
+                    <button onclick="window.cancelarEdicaoNome()" class="flex-1 bg-red-600/20 hover:bg-red-600/40 text-red-500 py-2 rounded-lg font-bold text-xs transition border border-red-900/50"><i class="fas fa-times"></i> Cancelar</button>
                 </div>
             </div>
 
@@ -220,14 +210,13 @@
                 <div id="iconeDestaque" class="hidden flex-col items-center justify-center gap-3 text-gray-500">
                     <i id="iconeDestaqueFa" class="fas fa-file text-6xl"></i>
                     <span id="txtDestaqueExt" class="text-sm font-bold uppercase">Arquivo</span>
-                    <span class="text-[10px] text-gray-600 mt-2 text-center px-4 max-w-xs">Pré-visualização visual não disponível para este formato específico. Utilize o botão baixar.</span>
                 </div>
             </div>
 
             <div class="grid grid-cols-3 gap-2">
-                <button onclick="abrirEdicaoNome()" class="bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-xs sm:text-sm shadow-md"><i class="fas fa-pen text-blue-500"></i> Editar</button>
-                <button id="btnBaixarAnexo" onclick="baixarAnexoAtivo()" class="bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-xs sm:text-sm shadow-md"><i class="fas fa-download"></i> Baixar</button>
-                <button id="btnExcluirDisfarce" onclick="executarExclusaoDisfarçada()" class="bg-red-950/60 hover:bg-red-900/80 text-red-400 border border-red-800/60 py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-xs sm:text-sm shadow-md"><i class="fas fa-trash-alt"></i> Excluir</button>
+                <button onclick="window.abrirEdicaoNome()" class="bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-xs sm:text-sm shadow-md"><i class="fas fa-pen text-blue-500"></i> Editar</button>
+                <button id="btnBaixarAnexo" onclick="window.baixarAnexoAtivo()" class="bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-xs sm:text-sm shadow-md"><i class="fas fa-download"></i> Baixar</button>
+                <button id="btnExcluirDisfarce" onclick="window.executarExclusaoDisfarçada()" class="bg-red-950/60 hover:bg-red-900/80 text-red-400 border border-red-800/60 py-3 rounded-lg font-bold transition flex items-center justify-center gap-2 text-xs sm:text-sm shadow-md"><i class="fas fa-trash-alt"></i> Excluir</button>
             </div>
         </div>
     </div>
@@ -238,7 +227,7 @@
             
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
                 <h3 class="text-lg font-bold text-white"><i class="fas fa-cloud-upload-alt text-blue-500"></i> Enviar Arquivos</h3>
-                <button onclick="fecharModalUpload()" class="text-gray-500 hover:text-white transition text-xl"><i class="fas fa-times"></i></button>
+                <button onclick="window.fecharModalUpload()" class="text-gray-500 hover:text-white transition text-xl"><i class="fas fa-times"></i></button>
             </div>
 
             <div class="flex flex-col gap-3">
@@ -254,25 +243,15 @@
                     <button onclick="document.getElementById('inputArquivoGenerico').click()" class="col-span-2 sm:col-span-1 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 py-3 rounded-xl flex items-center justify-center gap-2 transition"><i class="fas fa-file-upload text-purple-400"></i><span class="text-[11px] font-bold">Outros Arquivos</span></button>
                 </div>
 
-                <input type="file" id="inputArquivoCamera" accept="image/*" capture="environment" class="hidden" onchange="processarArquivosLote(this, 'camera')">
-                <input type="file" id="inputArquivoGaleria" accept="image/*" multiple class="hidden" onchange="processarArquivosLote(this, 'galeria')">
+                <input type="file" id="inputArquivoCamera" accept="image/*" capture="environment" class="hidden" onchange="window.processarArquivosLote(this, 'camera')">
+                <input type="file" id="inputArquivoGaleria" accept="image/*" multiple class="hidden" onchange="window.processarArquivosLote(this, 'galeria')">
                 
-                <input type="file" id="inputArquivoScannerCamera" accept="image/*" capture="environment" class="hidden" onchange="abrirModoScanner(this)">
-                <input type="file" id="inputArquivoScannerGaleria" accept="image/*" class="hidden" onchange="abrirModoScanner(this)">
+                <input type="file" id="inputArquivoScannerCamera" accept="image/*" capture="environment" class="hidden" onchange="window.abrirModoScanner(this)">
+                <input type="file" id="inputArquivoScannerGaleria" accept="image/*" class="hidden" onchange="window.abrirModoScanner(this)">
                 
-                <input type="file" id="inputArquivoGenerico" class="hidden" accept="*/*" multiple onchange="processarArquivosLote(this, 'generico')">
+                <input type="file" id="inputArquivoGenerico" class="hidden" accept="*/*" multiple onchange="window.processarArquivosLote(this, 'generico')">
 
-                <!-- PREVIEW UNIFICADO DE FILA DIVERSA -->
-                <div id="areaPreviewArquivos" class="hidden flex-col gap-3 mt-2">
-                    <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-                        <span class="text-xs font-bold text-blue-400"><i class="fas fa-layer-group"></i> Fila de Envio</span>
-                        <span id="txtQtdFila" class="text-[10px] text-gray-400 bg-gray-800 px-2 py-1 rounded border border-gray-700">0 itens</span>
-                    </div>
-                    <div id="listaArquivosFila" class="flex flex-col gap-2 max-h-40 overflow-y-auto custom-scrollbar pr-1"></div>
-                    <button onclick="window.acionarMaisItens()" class="w-full bg-gray-800 hover:bg-gray-700 border border-dashed border-gray-600 text-gray-300 py-3 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition"><i class="fas fa-plus"></i> Adicionar Mais Itens</button>
-                </div>
-
-                <!-- PREVIEW SCANNER ORIGINAL (CARRINHO DE PÁGINAS) -->
+                <!-- PREVIEW SCANNER -->
                 <div id="areaPreviewScanner" class="hidden flex-col gap-3 mt-2">
                     <div class="flex justify-between items-center border-b border-gray-800 pb-2">
                         <span class="text-xs font-bold text-red-400"><i class="fas fa-file-pdf"></i> Páginas Escaneadas</span>
@@ -285,13 +264,22 @@
                     </div>
                 </div>
 
+                <!-- PREVIEW DIVERSOS -->
+                <div id="areaPreviewArquivos" class="hidden flex-col gap-3 mt-2">
+                    <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                        <span class="text-xs font-bold text-blue-400"><i class="fas fa-layer-group"></i> Fila de Envio</span>
+                        <span id="txtQtdFila" class="text-[10px] text-gray-400 bg-gray-800 px-2 py-1 rounded border border-gray-700">0 itens</span>
+                    </div>
+                    <div id="listaArquivosFila" class="flex flex-col gap-2 max-h-40 overflow-y-auto custom-scrollbar pr-1"></div>
+                    <button onclick="window.acionarMaisItens()" class="w-full bg-gray-800 hover:bg-gray-700 border border-dashed border-gray-600 text-gray-300 py-3 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition"><i class="fas fa-plus"></i> Adicionar Mais Itens</button>
+                </div>
             </div>
 
             <div id="containerProgresso" class="hidden w-full bg-gray-950 rounded-full h-3 border border-gray-800 mt-2">
                 <div id="barraProgresso" class="bg-blue-500 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
             </div>
 
-            <button id="btnSalvarUpload" onclick="iniciarUploadStorage()" class="hidden w-full mt-2 bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-lg font-bold transition shadow-md flex items-center justify-center gap-2">
+            <button id="btnSalvarUpload" onclick="window.iniciarUploadStorage()" class="hidden w-full mt-2 bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-lg font-bold transition shadow-md flex items-center justify-center gap-2">
                 <i class="fas fa-cloud-upload-alt"></i> Salvar e Enviar
             </button>
         </div>
@@ -318,11 +306,11 @@
         </div>
     </div>
 
-    <!-- MODAL 1: CROPPER ORIGINAL COM NIVELAMENTO E ROTAÇÃO -->
+    <!-- MODAL 1: CROPPER -->
     <div id="modalCropperScanner" class="fixed inset-0 bg-gray-950 z-[60] hidden flex-col">
         <div class="flex justify-between items-center bg-gray-900 border-b border-gray-800 p-4 shadow-md">
             <h3 class="text-white font-bold text-sm flex items-center gap-2"><i class="fas fa-crop-alt text-blue-500"></i> Ajustar Bordas</h3>
-            <button onclick="cancelarScannerTotal()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            <button onclick="window.cancelarScannerTotal()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
         </div>
         
         <div class="flex-1 w-full bg-black relative overflow-hidden flex items-center justify-center p-4">
@@ -335,23 +323,23 @@
                 <span id="lblNivelamento">0°</span>
             </div>
             <div class="flex items-center gap-4">
-                <button onclick="ajustarNivelamento(-1)" class="text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 border border-gray-700 w-8 h-8 rounded-full flex items-center justify-center transition shadow-md"><i class="fas fa-minus text-xs"></i></button>
-                <input type="range" id="sliderNivelamento" min="-180" max="180" value="0" class="flex-1" oninput="nivelarCropper(this.value)">
-                <button onclick="ajustarNivelamento(1)" class="text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 border border-gray-700 w-8 h-8 rounded-full flex items-center justify-center transition shadow-md"><i class="fas fa-plus text-xs"></i></button>
+                <button onclick="window.ajustarNivelamento(-1)" class="text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 border border-gray-700 w-8 h-8 rounded-full flex items-center justify-center transition shadow-md"><i class="fas fa-minus text-xs"></i></button>
+                <input type="range" id="sliderNivelamento" min="-180" max="180" value="0" class="flex-1" oninput="window.nivelarCropper(this.value)">
+                <button onclick="window.ajustarNivelamento(1)" class="text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 border border-gray-700 w-8 h-8 rounded-full flex items-center justify-center transition shadow-md"><i class="fas fa-plus text-xs"></i></button>
             </div>
         </div>
 
         <div class="bg-gray-900 p-4 pb-8 flex gap-3">
-            <button onclick="cancelarScannerTotal()" class="flex-1 bg-gray-800 hover:bg-gray-700 text-white py-3.5 rounded-xl font-bold text-sm">Cancelar</button>
-            <button onclick="girarCropper()" class="bg-gray-700 hover:bg-gray-600 text-white w-14 rounded-xl font-bold text-lg flex items-center justify-center transition shadow-md"><i class="fas fa-rotate-right"></i></button>
-            <button onclick="avancarParaFiltros()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2">Avançar <i class="fas fa-arrow-right"></i></button>
+            <button onclick="window.cancelarScannerTotal()" class="flex-1 bg-gray-800 hover:bg-gray-700 text-white py-3.5 rounded-xl font-bold text-sm">Cancelar</button>
+            <button onclick="window.girarCropper()" class="bg-gray-700 hover:bg-gray-600 text-white w-14 rounded-xl font-bold text-lg flex items-center justify-center transition shadow-md"><i class="fas fa-rotate-right"></i></button>
+            <button onclick="window.avancarParaFiltros()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2">Avançar <i class="fas fa-arrow-right"></i></button>
         </div>
     </div>
 
-    <!-- MODAL 2: APLICADOR DE FILTROS, CAIXAS DE TEXTO MÚLTIPLAS E ASSINATURA -->
+    <!-- MODAL 2: APLICADOR DE FILTROS E MÚLTIPLAS CAIXAS -->
     <div id="modalFiltrosScanner" class="fixed inset-0 bg-gray-950 z-[70] hidden flex-col overflow-y-auto">
         <div class="flex justify-between items-center bg-gray-900 border-b border-gray-800 p-4 shadow-md">
-            <button onclick="voltarParaCropper()" class="text-gray-400 hover:text-white"><i class="fas fa-arrow-left text-xl"></i></button>
+            <button onclick="window.voltarParaCropper()" class="text-gray-400 hover:text-white"><i class="fas fa-arrow-left text-xl"></i></button>
             <h3 class="text-white font-bold text-sm flex items-center gap-2"><i class="fas fa-magic text-blue-500"></i> Passo 2: Limpeza e Edição</h3>
             <div class="w-6"></div> 
         </div>
@@ -376,31 +364,31 @@
                 </div>
             </div>
 
-            <!-- FILTROS BASE ORIGINAIS -->
+            <!-- FILTROS BASE -->
             <div class="flex overflow-x-auto gap-3 px-4 custom-scrollbar pb-1 mt-1">
-                <button id="btnFiltro_original" onclick="aplicarFiltroBase('original')" class="flex flex-col items-center gap-1.5 min-w-[70px]">
+                <button id="btnFiltro_original" onclick="window.aplicarFiltroBase('original')" class="flex flex-col items-center gap-1.5 min-w-[70px]">
                     <div class="w-10 h-10 bg-gray-800 border-2 border-gray-600 rounded flex items-center justify-center text-gray-400 transition" id="iconFiltro_original"><i class="fas fa-image text-sm"></i></div>
                     <span class="text-[9px] font-bold text-gray-400" id="txtFiltro_original">Original</span>
                 </button>
-                <button id="btnFiltro_auto" onclick="aplicarFiltroBase('auto')" class="flex flex-col items-center gap-1.5 min-w-[70px]">
+                <button id="btnFiltro_auto" onclick="window.aplicarFiltroBase('auto')" class="flex flex-col items-center gap-1.5 min-w-[70px]">
                     <div class="w-10 h-10 bg-gray-800 border-2 border-gray-600 rounded flex items-center justify-center text-yellow-500 transition" id="iconFiltro_auto"><i class="fas fa-wand-magic-sparkles text-sm"></i></div>
                     <span class="text-[9px] font-bold text-gray-400" id="txtFiltro_auto">Automático</span>
                 </button>
-                <button id="btnFiltro_cor" onclick="aplicarFiltroBase('cor')" class="flex flex-col items-center gap-1.5 min-w-[70px]">
+                <button id="btnFiltro_cor" onclick="window.aplicarFiltroBase('cor')" class="flex flex-col items-center gap-1.5 min-w-[70px]">
                     <div class="w-10 h-10 bg-gray-800 border-2 border-gray-600 rounded flex items-center justify-center text-blue-400 transition" id="iconFiltro_cor"><i class="fas fa-palette text-sm"></i></div>
                     <span class="text-[9px] font-bold text-gray-400" id="txtFiltro_cor">Cor</span>
                 </button>
-                <button id="btnFiltro_cinza" onclick="aplicarFiltroBase('cinza')" class="flex flex-col items-center gap-1.5 min-w-[70px]">
+                <button id="btnFiltro_cinza" onclick="window.aplicarFiltroBase('cinza')" class="flex flex-col items-center gap-1.5 min-w-[70px]">
                     <div class="w-10 h-10 bg-gray-800 border-2 border-gray-600 rounded flex items-center justify-center text-gray-400 transition" id="iconFiltro_cinza"><i class="fas fa-tint-slash text-sm"></i></div>
                     <span class="text-[9px] font-bold text-gray-400" id="txtFiltro_cinza">Cinza</span>
                 </button>
-                <button id="btnFiltro_pb" onclick="aplicarFiltroBase('pb')" class="flex flex-col items-center gap-1.5 min-w-[70px]">
+                <button id="btnFiltro_pb" onclick="window.aplicarFiltroBase('pb')" class="flex flex-col items-center gap-1.5 min-w-[70px]">
                     <div class="w-10 h-10 bg-gray-800 border-2 border-gray-600 rounded flex items-center justify-center text-white transition filtro-ativo" id="iconFiltro_pb"><i class="fas fa-copy text-sm"></i></div>
                     <span class="text-[9px] font-bold text-blue-400" id="txtFiltro_pb">P&B</span>
                 </button>
             </div>
 
-            <!-- CONTROLE DE CAIXAS DE TEXTO MÚLTIPLAS -->
+            <!-- CONTROLE DE CAIXAS DE TEXTO -->
             <div class="px-4 mt-2">
                 <div class="bg-gray-800/60 p-3 rounded-xl border border-gray-700/60 flex flex-col gap-3">
                     <div class="flex justify-between items-center">
@@ -457,7 +445,7 @@
                 <button onclick="window.abrirModalAssinatura()" class="bg-indigo-600 hover:bg-indigo-500 text-white py-3.5 rounded-xl font-bold text-xs sm:text-sm flex-1 flex items-center justify-center gap-2 transition shadow-lg">
                     <i class="fas fa-signature"></i> <span id="txtBtnAssinatura">Adicionar Assinatura</span>
                 </button>
-                <button onclick="confirmarSalvarPaginaScanner()" class="bg-blue-600 hover:bg-blue-500 text-white py-3.5 rounded-xl font-bold text-xs sm:text-sm flex-1 flex items-center justify-center gap-2 shadow-lg">
+                <button onclick="window.confirmarSalvarPaginaScanner()" class="bg-blue-600 hover:bg-blue-500 text-white py-3.5 rounded-xl font-bold text-xs sm:text-sm flex-1 flex items-center justify-center gap-2 shadow-lg">
                     <i class="fas fa-check"></i> Aplicar e Salvar Página
                 </button>
             </div>
@@ -482,14 +470,14 @@
         </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL E FIREBASE COM CREDENCIAIS ATUALIZADAS (anexos-2) -->
+    <!-- SCRIPT PRINCIPAL E FIREBASE COM PROTEÇÃO CONTRA NULL -->
     <script type="module">
         import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getDatabase, ref as dbRef, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
         import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
-        // CREDENCIAIS DO PROJETO FIREBASE anexos-2
+        // CREDENCIAIS ATUALIZADAS (PROJETO: anexos-2)
         const firebaseConfig = {
             apiKey: "AIzaSyCQ8--X39oK3BnwNES7zDklKnWP0_4hEas",
             authDomain: "anexos-2.firebaseapp.com",
@@ -538,6 +526,12 @@
         let assinandoPad = false;
         let ctxAssinaturaPad = null;
 
+        // HELPER PARA ESCUTAR EVENTOS SEM ERRO DE NULL
+        function escutarEventoSeguro(idElemento, evento, callback) {
+            const el = document.getElementById(idElemento);
+            if (el) el.addEventListener(evento, callback);
+        }
+
         window.toggleSidebar = function(abrir) {
             const sidebar = document.getElementById("sidebar");
             const overlay = document.getElementById("overlaySidebar");
@@ -579,30 +573,29 @@
                     modal.classList.remove("flex");
                     modal.classList.add("hidden");
                     window.limparModosUpload();
-                    document.getElementById("nomeArquivoManual").value = "";
+                    const elNome = document.getElementById("nomeArquivoManual");
+                    if (elNome) elNome.value = "";
                 }, 200);
             }
         };
 
         window.abrirModalOrigemScanner = function() {
             const modal = document.getElementById("modalOrigemScanner");
-            modal.classList.remove("hidden");
-            modal.classList.add("flex");
+            if (modal) { modal.classList.remove("hidden"); modal.classList.add("flex"); }
         };
 
         window.fecharModalOrigemScanner = function() {
             const modal = document.getElementById("modalOrigemScanner");
-            modal.classList.add("hidden");
-            modal.classList.remove("flex");
+            if (modal) { modal.classList.add("hidden"); modal.classList.remove("flex"); }
         };
 
         window.escolherOrigemScanner = function(origem) {
             window.fecharModalOrigemScanner();
             indicePaginaSendoEditada = null; 
             if (origem === 'camera') {
-                document.getElementById('inputArquivoScannerCamera').click();
+                document.getElementById('inputArquivoScannerCamera')?.click();
             } else {
-                document.getElementById('inputArquivoScannerGaleria').click();
+                document.getElementById('inputArquivoScannerGaleria')?.click();
             }
         };
 
@@ -612,13 +605,17 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const img = document.getElementById("imgParaCortar");
+                    if (!img) return;
                     img.src = e.target.result;
-                    document.getElementById("modalCropperScanner").classList.remove("hidden");
-                    document.getElementById("modalCropperScanner").classList.add("flex");
+                    
+                    const modalCrop = document.getElementById("modalCropperScanner");
+                    if (modalCrop) { modalCrop.classList.remove("hidden"); modalCrop.classList.add("flex"); }
                     
                     window.rotacaoBase = 90; 
-                    document.getElementById("sliderNivelamento").value = 0;
-                    document.getElementById("lblNivelamento").innerText = "0°";
+                    const slNiv = document.getElementById("sliderNivelamento");
+                    const lblNiv = document.getElementById("lblNivelamento");
+                    if (slNiv) slNiv.value = 0;
+                    if (lblNiv) lblNiv.innerText = "0°";
 
                     if (cropperInstancia) cropperInstancia.destroy();
                     
@@ -638,13 +635,15 @@
         window.girarCropper = function() {
             if (cropperInstancia) {
                 window.rotacaoBase = (window.rotacaoBase + 90) % 360;
-                let ajusteFino = parseFloat(document.getElementById("sliderNivelamento").value) || 0;
+                let slNiv = document.getElementById("sliderNivelamento");
+                let ajusteFino = slNiv ? parseFloat(slNiv.value) : 0;
                 cropperInstancia.rotateTo(window.rotacaoBase + ajusteFino);
             }
         };
 
         window.nivelarCropper = function(graus) {
-            document.getElementById("lblNivelamento").innerText = graus + "°";
+            const lbl = document.getElementById("lblNivelamento");
+            if (lbl) lbl.innerText = graus + "°";
             let ajusteFino = parseFloat(graus);
             if (cropperInstancia) {
                 cropperInstancia.rotateTo(window.rotacaoBase + ajusteFino);
@@ -653,16 +652,18 @@
 
         window.ajustarNivelamento = function(delta) {
             let slider = document.getElementById("sliderNivelamento");
-            let novoValor = parseInt(slider.value) + delta;
-            if (novoValor >= -180 && novoValor <= 180) {
-                slider.value = novoValor;
-                window.nivelarCropper(novoValor);
+            if (slider) {
+                let novoValor = parseInt(slider.value) + delta;
+                if (novoValor >= -180 && novoValor <= 180) {
+                    slider.value = novoValor;
+                    window.nivelarCropper(novoValor);
+                }
             }
         };
 
         window.cancelarScannerTotal = function() {
-            document.getElementById("modalCropperScanner").classList.add("hidden");
-            document.getElementById("modalCropperScanner").classList.remove("flex");
+            const modalCrop = document.getElementById("modalCropperScanner");
+            if (modalCrop) { modalCrop.classList.add("hidden"); modalCrop.classList.remove("flex"); }
             if (cropperInstancia) cropperInstancia.destroy();
             if (arrayPaginasEscaneadas.length === 0) window.limparModosUpload();
         };
@@ -690,35 +691,44 @@
             posicaoAssinatura = { x: larguraCrop - 220, y: alturaCrop - 150 };
             imgAssinaturaElemento = null;
             
-            document.getElementById("sliderBrilho").value = 0;
-            document.getElementById("sliderContraste").value = 0;
-            document.getElementById("painelControleAssinatura").classList.add("hidden");
-            document.getElementById("painelControleAssinatura").classList.remove("flex");
-            document.getElementById("txtBtnAssinatura").innerText = "Adicionar Assinatura";
-
-            document.getElementById("sliderLarguraCaixaTexto").max = larguraCrop;
-            document.getElementById("sliderLarguraCaixaTexto").value = Math.min(400, larguraCrop - 80);
-
-            document.getElementById("modalCropperScanner").classList.add("hidden");
-            document.getElementById("modalCropperScanner").classList.remove("flex");
+            const slB = document.getElementById("sliderBrilho"); if (slB) slB.value = 0;
+            const slC = document.getElementById("sliderContraste"); if (slC) slC.value = 0;
             
-            document.getElementById("modalFiltrosScanner").classList.remove("hidden");
-            document.getElementById("modalFiltrosScanner").classList.add("flex");
+            const pAss = document.getElementById("painelControleAssinatura");
+            if (pAss) { pAss.classList.add("hidden"); pAss.classList.remove("flex"); }
+            
+            const txtBtnAss = document.getElementById("txtBtnAssinatura");
+            if (txtBtnAss) txtBtnAss.innerText = "Adicionar Assinatura";
+
+            const slLarg = document.getElementById("sliderLarguraCaixaTexto");
+            if (slLarg) {
+                slLarg.max = larguraCrop;
+                slLarg.value = Math.min(400, larguraCrop - 80);
+            }
+
+            const modalCrop = document.getElementById("modalCropperScanner");
+            if (modalCrop) { modalCrop.classList.add("hidden"); modalCrop.classList.remove("flex"); }
+            
+            const modalFiltros = document.getElementById("modalFiltrosScanner");
+            if (modalFiltros) { modalFiltros.classList.remove("hidden"); modalFiltros.classList.add("flex"); }
 
             const canvasLive = document.getElementById("canvasLivePreview");
-            canvasLive.width = larguraCrop;
-            canvasLive.height = alturaCrop;
+            if (canvasLive) {
+                canvasLive.width = larguraCrop;
+                canvasLive.height = alturaCrop;
+                configurarEventosArrastoCanvas(canvasLive);
+            }
             
-            configurarEventosArrastoCanvas(canvasLive);
             sincronizarPainelComCaixaAtiva();
             window.aplicarFiltroBase('pb'); 
         };
 
         window.voltarParaCropper = function() {
-            document.getElementById("modalFiltrosScanner").classList.add("hidden");
-            document.getElementById("modalFiltrosScanner").classList.remove("flex");
-            document.getElementById("modalCropperScanner").classList.remove("hidden");
-            document.getElementById("modalCropperScanner").classList.add("flex");
+            const modalFiltros = document.getElementById("modalFiltrosScanner");
+            if (modalFiltros) { modalFiltros.classList.add("hidden"); modalFiltros.classList.remove("flex"); }
+            
+            const modalCrop = document.getElementById("modalCropperScanner");
+            if (modalCrop) { modalCrop.classList.remove("hidden"); modalCrop.classList.add("flex"); }
         };
 
         window.aplicarFiltroBase = function(tipo) {
@@ -727,17 +737,19 @@
             filtros.forEach(f => {
                 const icon = document.getElementById('iconFiltro_' + f);
                 const txt = document.getElementById('txtFiltro_' + f);
-                if (f === tipo) {
-                    icon.classList.add('filtro-ativo');
-                    txt.classList.replace('text-gray-400', 'text-blue-400');
-                } else {
-                    icon.classList.remove('filtro-ativo');
-                    txt.classList.replace('text-blue-400', 'text-gray-400');
+                if (icon && txt) {
+                    if (f === tipo) {
+                        icon.classList.add('filtro-ativo');
+                        txt.classList.replace('text-gray-400', 'text-blue-400');
+                    } else {
+                        icon.classList.remove('filtro-ativo');
+                        txt.classList.replace('text-blue-400', 'text-gray-400');
+                    }
                 }
             });
 
-            document.getElementById("sliderBrilho").value = 0;
-            document.getElementById("sliderContraste").value = (tipo === 'pb') ? 20 : 0; 
+            const slB = document.getElementById("sliderBrilho"); if (slB) slB.value = 0;
+            const slC = document.getElementById("sliderContraste"); if (slC) slC.value = (tipo === 'pb') ? 20 : 0; 
             window.renderizarFiltroAtual(true);
         };
 
@@ -772,46 +784,48 @@
 
             if (indiceCaixaTextoAtiva !== null && caixasTexto[indiceCaixaTextoAtiva]) {
                 const caixa = caixasTexto[indiceCaixaTextoAtiva];
-                painel.classList.remove("hidden");
-                painel.classList.add("flex");
-                msg.classList.add("hidden");
+                if (painel) { painel.classList.remove("hidden"); painel.classList.add("flex"); }
+                if (msg) msg.classList.add("hidden");
 
-                document.getElementById("inputTextoCanvas").value = caixa.texto;
-                document.getElementById("corTextoCanvas").value = caixa.cor;
-                document.getElementById("sliderTamanhoFonte").value = caixa.tamanhoFonte;
-                document.getElementById("sliderLarguraCaixaTexto").max = larguraCrop;
-                document.getElementById("sliderLarguraCaixaTexto").value = caixa.larguraCaixa;
+                const inTxt = document.getElementById("inputTextoCanvas"); if (inTxt) inTxt.value = caixa.texto;
+                const corTxt = document.getElementById("corTextoCanvas"); if (corTxt) corTxt.value = caixa.cor;
+                const slFonte = document.getElementById("sliderTamanhoFonte"); if (slFonte) slFonte.value = caixa.tamanhoFonte;
+                const slLarg = document.getElementById("sliderLarguraCaixaTexto"); 
+                if (slLarg) { slLarg.max = larguraCrop; slLarg.value = caixa.larguraCaixa; }
             } else {
-                painel.classList.add("hidden");
-                painel.classList.remove("flex");
-                msg.classList.remove("hidden");
+                if (painel) { painel.classList.add("hidden"); painel.classList.remove("flex"); }
+                if (msg) msg.classList.remove("hidden");
             }
         }
 
         window.atualizarTextoCaixaAtiva = function() {
             if (indiceCaixaTextoAtiva !== null && caixasTexto[indiceCaixaTextoAtiva]) {
-                caixasTexto[indiceCaixaTextoAtiva].texto = document.getElementById("inputTextoCanvas").value;
+                const el = document.getElementById("inputTextoCanvas");
+                if (el) caixasTexto[indiceCaixaTextoAtiva].texto = el.value;
                 window.renderizarFiltroAtual(true);
             }
         };
 
         window.atualizarCorCaixaAtiva = function() {
             if (indiceCaixaTextoAtiva !== null && caixasTexto[indiceCaixaTextoAtiva]) {
-                caixasTexto[indiceCaixaTextoAtiva].cor = document.getElementById("corTextoCanvas").value;
+                const el = document.getElementById("corTextoCanvas");
+                if (el) caixasTexto[indiceCaixaTextoAtiva].cor = el.value;
                 window.renderizarFiltroAtual(true);
             }
         };
 
         window.atualizarTamanhoCaixaAtiva = function() {
             if (indiceCaixaTextoAtiva !== null && caixasTexto[indiceCaixaTextoAtiva]) {
-                caixasTexto[indiceCaixaTextoAtiva].tamanhoFonte = parseInt(document.getElementById("sliderTamanhoFonte").value);
+                const el = document.getElementById("sliderTamanhoFonte");
+                if (el) caixasTexto[indiceCaixaTextoAtiva].tamanhoFonte = parseInt(el.value);
                 window.renderizarFiltroAtual(true);
             }
         };
 
         window.atualizarLarguraCaixaAtiva = function() {
             if (indiceCaixaTextoAtiva !== null && caixasTexto[indiceCaixaTextoAtiva]) {
-                caixasTexto[indiceCaixaTextoAtiva].larguraCaixa = parseInt(document.getElementById("sliderLarguraCaixaTexto").value);
+                const el = document.getElementById("sliderLarguraCaixaTexto");
+                if (el) caixasTexto[indiceCaixaTextoAtiva].larguraCaixa = parseInt(el.value);
                 window.renderizarFiltroAtual(true);
             }
         };
@@ -873,20 +887,25 @@
 
         window.renderizarFiltroAtual = function(mostrarGuias = true) {
             const canvasLive = document.getElementById("canvasLivePreview");
+            if (!canvasLive || !canvasOriginalContextData) return;
             const ctxLive = canvasLive.getContext("2d");
             
-            let valBrilho = parseInt(document.getElementById("sliderBrilho").value);
-            let valContraste = parseInt(document.getElementById("sliderContraste").value);
+            const slB = document.getElementById("sliderBrilho");
+            const slC = document.getElementById("sliderContraste");
+            let valBrilho = slB ? parseInt(slB.value) : 0;
+            let valContraste = slC ? parseInt(slC.value) : 0;
 
             if (indiceCaixaTextoAtiva !== null && caixasTexto[indiceCaixaTextoAtiva]) {
-                document.getElementById("lblTamanhoFonte").innerText = caixasTexto[indiceCaixaTextoAtiva].tamanhoFonte + "px";
-                document.getElementById("lblLarguraCaixaTexto").innerText = caixasTexto[indiceCaixaTextoAtiva].larguraCaixa + "px";
+                const lblF = document.getElementById("lblTamanhoFonte");
+                const lblL = document.getElementById("lblLarguraCaixaTexto");
+                if (lblF) lblF.innerText = caixasTexto[indiceCaixaTextoAtiva].tamanhoFonte + "px";
+                if (lblL) lblL.innerText = caixasTexto[indiceCaixaTextoAtiva].larguraCaixa + "px";
             }
 
             // 1. Imagem Base
             ctxLive.putImageData(canvasOriginalContextData, 0, 0);
             
-            // 2. Filtros de Imagem
+            // 2. Filtros
             if (window.filtroAtivo !== 'original' || valBrilho !== 0 || valContraste !== 0) {
                 const imgData = ctxLive.getImageData(0, 0, larguraCrop, alturaCrop);
                 const data = imgData.data;
@@ -946,7 +965,8 @@
 
             // 4. Renderiza Assinatura
             if (imgAssinaturaElemento) {
-                let escala = parseInt(document.getElementById("sliderEscalaAssinatura").value) / 100;
+                const slEsc = document.getElementById("sliderEscalaAssinatura");
+                let escala = slEsc ? parseInt(slEsc.value) / 100 : 0.5;
                 let larguraAss = (larguraCrop * 0.35) * escala;
                 let alturaAss = (imgAssinaturaElemento.height * larguraAss) / imgAssinaturaElemento.width;
                 ctxLive.drawImage(imgAssinaturaElemento, posicaoAssinatura.x, posicaoAssinatura.y, larguraAss, alturaAss);
@@ -970,7 +990,8 @@
                 const pos = obterPosicaoRealCanvas(e);
                 
                 if (imgAssinaturaElemento) {
-                    let escala = parseInt(document.getElementById("sliderEscalaAssinatura").value) / 100;
+                    const slEsc = document.getElementById("sliderEscalaAssinatura");
+                    let escala = slEsc ? parseInt(slEsc.value) / 100 : 0.5;
                     let larguraAss = (larguraCrop * 0.35) * escala;
                     let alturaAss = (imgAssinaturaElemento.height * larguraAss) / imgAssinaturaElemento.width;
                     
@@ -1031,10 +1052,10 @@
 
         window.abrirModalAssinatura = function() {
             const modal = document.getElementById("modalAssinatura");
-            modal.classList.remove("hidden");
-            modal.classList.add("flex");
+            if (modal) { modal.classList.remove("hidden"); modal.classList.add("flex"); }
             
             const canvasAss = document.getElementById("canvasAssinatura");
+            if (!canvasAss) return;
             canvasAss.width = canvasAss.offsetWidth;
             canvasAss.height = canvasAss.offsetHeight;
             
@@ -1066,20 +1087,24 @@
         };
 
         window.fecharModalAssinatura = function() {
-            document.getElementById("modalAssinatura").classList.add("hidden");
-            document.getElementById("modalAssinatura").classList.remove("flex");
+            const modal = document.getElementById("modalAssinatura");
+            if (modal) { modal.classList.add("hidden"); modal.classList.remove("flex"); }
         };
 
         window.salvarAssinaturaParaCanvas = function() {
             const canvasAss = document.getElementById("canvasAssinatura");
+            if (!canvasAss) return;
             const dataUrl = canvasAss.toDataURL("image/png");
             
             const img = new Image();
             img.onload = function() {
                 imgAssinaturaElemento = img;
-                document.getElementById("painelControleAssinatura").classList.remove("hidden");
-                document.getElementById("painelControleAssinatura").classList.add("flex");
-                document.getElementById("txtBtnAssinatura").innerText = "Refazer Assinatura";
+                const pAss = document.getElementById("painelControleAssinatura");
+                if (pAss) { pAss.classList.remove("hidden"); pAss.classList.add("flex"); }
+                
+                const txtBtnAss = document.getElementById("txtBtnAssinatura");
+                if (txtBtnAss) txtBtnAss.innerText = "Refazer Assinatura";
+                
                 window.fecharModalAssinatura();
                 window.renderizarFiltroAtual(true);
             };
@@ -1088,56 +1113,44 @@
 
         window.removerAssinaturaCanvas = function() {
             imgAssinaturaElemento = null;
-            document.getElementById("painelControleAssinatura").classList.add("hidden");
-            document.getElementById("painelControleAssinatura").classList.remove("flex");
-            document.getElementById("txtBtnAssinatura").innerText = "Adicionar Assinatura";
+            const pAss = document.getElementById("painelControleAssinatura");
+            if (pAss) { pAss.classList.add("hidden"); pAss.classList.remove("flex"); }
+            
+            const txtBtnAss = document.getElementById("txtBtnAssinatura");
+            if (txtBtnAss) txtBtnAss.innerText = "Adicionar Assinatura";
+            
             window.renderizarFiltroAtual(true);
         };
 
-        // SALVAR PÁGINA ESCANEADA SEM BORDAS/MOLDURAS NO DATAURL FINAL
         window.confirmarSalvarPaginaScanner = function() {
             window.renderizarFiltroAtual(false);
             const canvasLive = document.getElementById("canvasLivePreview");
+            if (!canvasLive) return;
             const imgSalvaDataUrl = canvasLive.toDataURL('image/jpeg', 0.85); 
 
-            const estadoPagina = {
-                imagemBaseContextData: canvasOriginalContextData,
-                larguraCrop: larguraCrop,
-                alturaCrop: alturaCrop,
-                caixasTexto: JSON.parse(JSON.stringify(caixasTexto)),
-                indiceCaixaTextoAtiva: indiceCaixaTextoAtiva,
-                posicaoAssinatura: { ...posicaoAssinatura },
-                imgAssinaturaElemento: imgAssinaturaElemento,
-                escalaAssinatura: document.getElementById("sliderEscalaAssinatura").value,
-                brilho: document.getElementById("sliderBrilho").value,
-                contraste: document.getElementById("sliderContraste").value,
-                finalDataUrl: imgSalvaDataUrl
-            };
-
-            if (indicePaginaSendoEditada !== null) {
-                arrayPaginasEscaneadas[indicePaginaSendoEditada] = estadoPagina;
-            } else {
-                arrayPaginasEscaneadas.push(estadoPagina);
-            }
-
+            arrayPaginasEscaneadas.push(imgSalvaDataUrl);
             modoUploadAtual = 'scanner';
 
-            document.getElementById("modalFiltrosScanner").classList.add("hidden");
-            document.getElementById("modalFiltrosScanner").classList.remove("flex");
+            const modalFiltros = document.getElementById("modalFiltrosScanner");
+            if (modalFiltros) { modalFiltros.classList.add("hidden"); modalFiltros.classList.remove("flex"); }
             if (cropperInstancia) cropperInstancia.destroy();
             window.renderizarCarrinhoScanner();
         };
 
         window.renderizarCarrinhoScanner = function() {
-            document.getElementById("areaEscolhaModo").classList.add("hidden");
-            document.getElementById("areaPreviewScanner").classList.remove("hidden");
-            document.getElementById("areaPreviewScanner").classList.add("flex");
-            document.getElementById("btnSalvarUpload").classList.remove("hidden");
-            document.getElementById("btnSalvarUpload").classList.add("flex");
+            const areaEscolha = document.getElementById("areaEscolhaModo");
+            const areaPrev = document.getElementById("areaPreviewScanner");
+            const btnSalvar = document.getElementById("btnSalvarUpload");
+            
+            if (areaEscolha) areaEscolha.classList.add("hidden");
+            if (areaPrev) { areaPrev.classList.remove("hidden"); areaPrev.classList.add("flex"); }
+            if (btnSalvar) { btnSalvar.classList.remove("hidden"); btnSalvar.classList.add("flex"); }
 
             const grid = document.getElementById("gridPaginasScanner");
-            grid.innerHTML = "";
-            document.getElementById("txtQtdPaginas").innerText = `${arrayPaginasEscaneadas.length} páginas`;
+            if (grid) grid.innerHTML = "";
+            
+            const txtQtd = document.getElementById("txtQtdPaginas");
+            if (txtQtd) txtQtd.innerText = `${arrayPaginasEscaneadas.length} páginas`;
 
             arrayPaginasEscaneadas.forEach((pagData, index) => {
                 let imgUrl = typeof pagData === 'string' ? pagData : pagData.finalDataUrl;
@@ -1151,7 +1164,7 @@
                         <button onclick="window.removerPaginaScanner(${index})" class="bg-red-600 hover:bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-lg"><i class="fas fa-times text-[9px]"></i></button>
                     </div>
                 `;
-                grid.appendChild(div);
+                if (grid) grid.appendChild(div);
             });
             if (arrayPaginasEscaneadas.length === 0) window.limparModosUpload();
         };
@@ -1167,30 +1180,27 @@
             arrayPaginasEscaneadas = [];
             indicePaginaSendoEditada = null;
             
-            document.getElementById("inputArquivoCamera").value = "";
-            document.getElementById("inputArquivoGaleria").value = "";
-            document.getElementById("inputArquivoScannerCamera").value = "";
-            document.getElementById("inputArquivoScannerGaleria").value = "";
-            document.getElementById("inputArquivoGenerico").value = "";
+            const inCam = document.getElementById("inputArquivoCamera"); if (inCam) inCam.value = "";
+            const inGal = document.getElementById("inputArquivoGaleria"); if (inGal) inGal.value = "";
+            const inScanCam = document.getElementById("inputArquivoScannerCamera"); if (inScanCam) inScanCam.value = "";
+            const inScanGal = document.getElementById("inputArquivoScannerGaleria"); if (inScanGal) inScanGal.value = "";
+            const inGen = document.getElementById("inputArquivoGenerico"); if (inGen) inGen.value = "";
             
-            document.getElementById("areaEscolhaModo").classList.remove("hidden");
-            document.getElementById("areaPreviewArquivos").classList.add("hidden");
-            document.getElementById("areaPreviewArquivos").classList.remove("flex");
-            document.getElementById("areaPreviewScanner").classList.add("hidden");
-            document.getElementById("areaPreviewScanner").classList.remove("flex");
-            document.getElementById("btnSalvarUpload").classList.add("hidden");
-            document.getElementById("btnSalvarUpload").classList.remove("flex");
+            const areaEscolha = document.getElementById("areaEscolhaModo"); if (areaEscolha) areaEscolha.classList.remove("hidden");
+            const areaPrevArq = document.getElementById("areaPreviewArquivos"); if (areaPrevArq) { areaPrevArq.classList.add("hidden"); areaPrevArq.classList.remove("flex"); }
+            const areaPrevScan = document.getElementById("areaPreviewScanner"); if (areaPrevScan) { areaPrevScan.classList.add("hidden"); areaPrevScan.classList.remove("flex"); }
+            const btnSalvar = document.getElementById("btnSalvarUpload"); if (btnSalvar) { btnSalvar.classList.add("hidden"); btnSalvar.classList.remove("flex"); }
         };
 
         window.processarArquivosLote = function(input, tipo) {
             if (input.files && input.files.length > 0) {
                 modoUploadAtual = tipo; 
                 for (let i = 0; i < input.files.length; i++) { arquivosFilaEnvio.push(input.files[i]); }
-                document.getElementById("areaEscolhaModo").classList.add("hidden");
-                document.getElementById("areaPreviewArquivos").classList.remove("hidden");
-                document.getElementById("areaPreviewArquivos").classList.add("flex");
-                document.getElementById("btnSalvarUpload").classList.remove("hidden");
-                document.getElementById("btnSalvarUpload").classList.add("flex");
+                
+                const areaEscolha = document.getElementById("areaEscolhaModo"); if (areaEscolha) areaEscolha.classList.add("hidden");
+                const areaPrevArq = document.getElementById("areaPreviewArquivos"); if (areaPrevArq) { areaPrevArq.classList.remove("hidden"); areaPrevArq.classList.add("flex"); }
+                const btnSalvar = document.getElementById("btnSalvarUpload"); if (btnSalvar) { btnSalvar.classList.remove("hidden"); btnSalvar.classList.add("flex"); }
+                
                 window.renderizarListaFilaEnvio();
             }
             input.value = "";
@@ -1198,8 +1208,11 @@
 
         window.renderizarListaFilaEnvio = function() {
             const container = document.getElementById("listaArquivosFila");
+            if (!container) return;
             container.innerHTML = "";
-            document.getElementById("txtQtdFila").innerText = `${arquivosFilaEnvio.length} itens`;
+            
+            const txtQtd = document.getElementById("txtQtdFila");
+            if (txtQtd) txtQtd.innerText = `${arquivosFilaEnvio.length} itens`;
             
             arquivosFilaEnvio.forEach((file, index) => {
                 let isImg = file.type.startsWith('image/');
@@ -1217,22 +1230,21 @@
             window.renderizarListaFilaEnvio();
         };
 
-        // GERAÇÃO DE PDF COMPATÍVEL COM STRINGS OU OBJETOS DE ESTADO
         window.iniciarUploadStorage = function() {
-            let nomeDigitado = document.getElementById("nomeArquivoManual").value.trim();
+            const inNome = document.getElementById("nomeArquivoManual");
+            let nomeDigitado = inNome ? inNome.value.trim() : "";
             if (!nomeDigitado) return alert("⚠️ Digite um nome ou descrição para a remessa!");
 
             const btnSalvar = document.getElementById("btnSalvarUpload");
             const containerProgresso = document.getElementById("containerProgresso");
             const barraProgresso = document.getElementById("barraProgresso");
             
-            btnSalvar.disabled = true;
-            btnSalvar.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Preparando...`;
-            containerProgresso.classList.remove("hidden");
-            barraProgresso.style.width = '0%';
+            if (btnSalvar) { btnSalvar.disabled = true; btnSalvar.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Preparando...`; }
+            if (containerProgresso) containerProgresso.classList.remove("hidden");
+            if (barraProgresso) barraProgresso.style.width = '0%';
 
             if (modoUploadAtual === 'scanner') {
-                btnSalvar.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Gerando PDF...`;
+                if (btnSalvar) btnSalvar.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Gerando PDF...`;
                 setTimeout(() => {
                     const { jsPDF } = window.jspdf;
                     const doc = new jsPDF({ orientation: 'p', unit: 'pt', format: 'a4' });
@@ -1260,7 +1272,7 @@
                 async function processarFilaEmLote() {
                     for (let i = 0; i < totalArquivos; i++) {
                         const file = arquivosFilaEnvio[i];
-                        btnSalvar.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Enviando ${i+1}/${totalArquivos}...`;
+                        if (btnSalvar) btnSalvar.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Enviando ${i+1}/${totalArquivos}...`;
                         let sufixoNome = totalArquivos > 1 ? ` (${i+1})` : "";
                         let nomeParaBanco = nomeDigitado + sufixoNome;
                         let tipoDoBanco = 'arquivo';
@@ -1268,7 +1280,7 @@
                         else { const extMatch = file.name.match(/\.([^.]+)$/); if (extMatch) tipoDoBanco = extMatch[1].toLowerCase(); }
 
                         await fazerUploadUnico(file, tipoDoBanco, nomeParaBanco, file.type || 'application/octet-stream');
-                        concluidos++; barraProgresso.style.width = ((concluidos / totalArquivos) * 100) + '%';
+                        concluidos++; if (barraProgresso) barraProgresso.style.width = ((concluidos / totalArquivos) * 100) + '%';
                     }
                     window.fecharModalUpload(); resetarBotaoAposErro();
                 }
@@ -1299,8 +1311,9 @@
             }
 
             function resetarBotaoAposErro() {
-                btnSalvar.disabled = false; btnSalvar.innerHTML = `<i class="fas fa-cloud-upload-alt"></i> Salvar e Enviar`;
-                containerProgresso.classList.add("hidden"); barraProgresso.style.width = '0%';
+                if (btnSalvar) { btnSalvar.disabled = false; btnSalvar.innerHTML = `<i class="fas fa-cloud-upload-alt"></i> Salvar e Enviar`; }
+                if (containerProgresso) containerProgresso.classList.add("hidden"); 
+                if (barraProgresso) barraProgresso.style.width = '0%';
             }
         };
 
@@ -1333,10 +1346,12 @@
                     todosAnexosNaMemoria.sort((a, b) => b.dataEnvio - a.dataEnvio);
                 }
 
-                const valorAtualSelect = selectUsuario.value;
-                selectUsuario.innerHTML = '<option value="todos">Todos os Usuários</option>';
-                usuariosUnicos.forEach(user => { selectUsuario.innerHTML += `<option value="${user}">@${user}</option>`; });
-                selectUsuario.value = usuariosUnicos.has(valorAtualSelect) ? valorAtualSelect : "todos";
+                if (selectUsuario) {
+                    const valorAtualSelect = selectUsuario.value;
+                    selectUsuario.innerHTML = '<option value="todos">Todos os Usuários</option>';
+                    usuariosUnicos.forEach(user => { selectUsuario.innerHTML += `<option value="${user}">@${user}</option>`; });
+                    selectUsuario.value = usuariosUnicos.has(valorAtualSelect) ? valorAtualSelect : "todos";
+                }
 
                 window.aplicarFiltrosNaGaleria();
             });
@@ -1353,13 +1368,19 @@
         };
 
         window.aplicarFiltrosNaGaleria = function() {
-            const termoBusca = document.getElementById("inputBuscaAnexo").value.toLowerCase().trim();
-            const dataInicio = document.getElementById("dataInicioFiltro").value;
-            const dataFim = document.getElementById("dataFimFiltro").value;
-            const usuarioFiltro = document.getElementById("filtroUsuario").value;
+            const inBusca = document.getElementById("inputBuscaAnexo");
+            const inIni = document.getElementById("dataInicioFiltro");
+            const inFim = document.getElementById("dataFimFiltro");
+            const selUser = document.getElementById("filtroUsuario");
+
+            const termoBusca = inBusca ? inBusca.value.toLowerCase().trim() : "";
+            const dataInicio = inIni ? inIni.value : "";
+            const dataFim = inFim ? inFim.value : "";
+            const usuarioFiltro = selUser ? selUser.value : "todos";
 
             const container = document.getElementById("listaAnexos");
             const areaBreadcrumb = document.getElementById("areaBreadcrumb");
+            if (!container) return;
             container.innerHTML = "";
             
             let anexosFiltrados = todosAnexosNaMemoria.filter(arq => {
@@ -1391,9 +1412,12 @@
                 }
             }
 
+            const txtInfo = document.getElementById("txtInfoVista");
+            const txtCount = document.getElementById("txtContadorArquivos");
+
             if (window.pastaAbertaAtual === null && !isBuscaAtiva) {
-                areaBreadcrumb.innerHTML = `<span class="text-gray-300 font-bold"><i class="fas fa-folder text-blue-500 mr-2"></i> Pastas do Sistema</span>`;
-                document.getElementById("txtInfoVista").innerText = "Selecionar Data ou Mês";
+                if (areaBreadcrumb) areaBreadcrumb.innerHTML = `<span class="text-gray-300 font-bold"><i class="fas fa-folder text-blue-500 mr-2"></i> Pastas do Sistema</span>`;
+                if (txtInfo) txtInfo.innerText = "Selecionar Data ou Mês";
 
                 const agrupamentoPastas = {};
                 anexosFiltrados.forEach(arq => {
@@ -1408,11 +1432,11 @@
                 if (pastasOrdenadas.length === 0) { container.innerHTML = `<div class="col-span-full p-8 text-center text-gray-600">Nenhuma pasta gerada ainda.</div>`; }
 
                 pastasOrdenadas.forEach(nomePasta => { renderizarCardPasta(container, nomePasta, agrupamentoPastas[nomePasta].arquivos, `window.abrirPasta('${nomePasta}')`); });
-                document.getElementById("txtContadorArquivos").innerText = `${pastasOrdenadas.length} pastas`;
+                if (txtCount) txtCount.innerText = `${pastasOrdenadas.length} pastas`;
 
             } else if (visualizandoSubPastasMensais && !isBuscaAtiva) {
-                areaBreadcrumb.innerHTML = `<button onclick="window.voltarParaPastas()" class="text-gray-400 hover:text-white transition flex items-center gap-2"><i class="fas fa-arrow-left"></i> Voltar</button><span class="text-gray-600 mx-2">/</span><span class="text-gray-300 font-bold"><i class="fas fa-folder-open text-blue-500"></i> ${nomePastaMensalAtual}</span>`;
-                document.getElementById("txtInfoVista").innerText = "Selecionar Dia";
+                if (areaBreadcrumb) areaBreadcrumb.innerHTML = `<button onclick="window.voltarParaPastas()" class="text-gray-400 hover:text-white transition flex items-center gap-2"><i class="fas fa-arrow-left"></i> Voltar</button><span class="text-gray-600 mx-2">/</span><span class="text-gray-300 font-bold"><i class="fas fa-folder-open text-blue-500"></i> ${nomePastaMensalAtual}</span>`;
+                if (txtInfo) txtInfo.innerText = "Selecionar Dia";
 
                 const agrupamentoDias = {};
                 const arquivosDoMes = anexosFiltrados.filter(arq => {
@@ -1435,14 +1459,14 @@
                 if (diasOrdenados.length === 0) { container.innerHTML = `<div class="col-span-full p-8 text-center text-gray-600">Nenhum dia encontrado neste mês.</div>`; }
 
                 diasOrdenados.forEach(dataBR => { renderizarCardPasta(container, dataBR, agrupamentoDias[dataBR], `window.abrirPasta('${dataBR}')`); });
-                document.getElementById("txtContadorArquivos").innerText = `${diasOrdenados.length} dias`;
+                if (txtCount) txtCount.innerText = `${diasOrdenados.length} dias`;
 
             } else {
                 let arquivosParaExibir = anexosFiltrados;
 
                 if (isBuscaAtiva) {
-                    areaBreadcrumb.innerHTML = `<button onclick="document.getElementById('inputBuscaAnexo').value=''; window.aplicarFiltrosNaGaleria();" class="text-gray-400 hover:text-white transition flex items-center gap-2"><i class="fas fa-arrow-left"></i> Limpar Busca</button><span class="text-gray-600 mx-2">/</span><span class="text-blue-400 font-bold"><i class="fas fa-search"></i> Resultados em Todas as Pastas</span>`;
-                    document.getElementById("txtInfoVista").innerText = "Resultados da Pesquisa";
+                    if (areaBreadcrumb) areaBreadcrumb.innerHTML = `<button onclick="document.getElementById('inputBuscaAnexo').value=''; window.aplicarFiltrosNaGaleria();" class="text-gray-400 hover:text-white transition flex items-center gap-2"><i class="fas fa-arrow-left"></i> Limpar Busca</button><span class="text-gray-600 mx-2">/</span><span class="text-blue-400 font-bold"><i class="fas fa-search"></i> Resultados em Todas as Pastas</span>`;
+                    if (txtInfo) txtInfo.innerText = "Resultados da Pesquisa";
                 } else {
                     const dataBR = window.pastaAbertaAtual;
                     const partesData = dataBR.split('/');
@@ -1452,16 +1476,18 @@
                         const hoje = new Date();
                         const eMesAtual = (parseInt(partesData[1]) === hoje.getMonth() + 1 && parseInt(partesData[2]) === hoje.getFullYear());
 
-                        if (eMesAtual) {
-                            areaBreadcrumb.innerHTML = `<button onclick="window.voltarParaPastas()" class="text-gray-400 hover:text-white transition flex items-center gap-2"><i class="fas fa-arrow-left"></i> Voltar</button><span class="text-gray-600 mx-2">/</span><span class="text-gray-300 font-bold"><i class="fas fa-folder-open text-blue-500"></i> ${dataBR}</span>`;
-                        } else {
-                            areaBreadcrumb.innerHTML = `<button onclick="window.abrirPasta('${mesAno}')" class="text-gray-400 hover:text-white transition flex items-center gap-2"><i class="fas fa-arrow-left"></i> Voltar para ${mesAno}</button><span class="text-gray-600 mx-2">/</span><span class="text-gray-300 font-bold"><i class="fas fa-folder-open text-blue-500"></i> ${dataBR}</span>`;
+                        if (areaBreadcrumb) {
+                            if (eMesAtual) {
+                                areaBreadcrumb.innerHTML = `<button onclick="window.voltarParaPastas()" class="text-gray-400 hover:text-white transition flex items-center gap-2"><i class="fas fa-arrow-left"></i> Voltar</button><span class="text-gray-600 mx-2">/</span><span class="text-gray-300 font-bold"><i class="fas fa-folder-open text-blue-500"></i> ${dataBR}</span>`;
+                            } else {
+                                areaBreadcrumb.innerHTML = `<button onclick="window.abrirPasta('${mesAno}')" class="text-gray-400 hover:text-white transition flex items-center gap-2"><i class="fas fa-arrow-left"></i> Voltar para ${mesAno}</button><span class="text-gray-600 mx-2">/</span><span class="text-gray-300 font-bold"><i class="fas fa-folder-open text-blue-500"></i> ${dataBR}</span>`;
+                            }
                         }
                     } else {
                         window.voltarParaPastas(); return;
                     }
                     
-                    document.getElementById("txtInfoVista").innerText = "Arquivos da Pasta";
+                    if (txtInfo) txtInfo.innerText = "Arquivos da Pasta";
                     arquivosParaExibir = anexosFiltrados.filter(arq => { return new Date(arq.dataEnvio).toLocaleDateString('pt-BR') === dataBR; });
                 }
 
@@ -1483,7 +1509,7 @@
                     container.appendChild(card);
                 });
 
-                document.getElementById("txtContadorArquivos").innerText = `${arquivosParaExibir.length} itens`;
+                if (txtCount) txtCount.innerText = `${arquivosParaExibir.length} itens`;
             }
         };
 
@@ -1509,7 +1535,8 @@
 
         window.abrirModalVisualizacao = function(id, url, nome, tipo) {
             window.idImagemAtiva = id; window.urlImagemAtiva = url; window.tipoAnexoAtivo = tipo || 'imagem';
-            document.getElementById("tituloImagemCard").innerText = nome; document.getElementById("inputEdicaoNome").value = nome;
+            const tCard = document.getElementById("tituloImagemCard"); if (tCard) tCard.innerText = nome;
+            const inEd = document.getElementById("inputEdicaoNome"); if (inEd) inEd.value = nome;
             const tp = window.tipoAnexoAtivo.toLowerCase();
             
             const elImagem = document.getElementById("imagemEmDestaque"); 
@@ -1518,82 +1545,113 @@
             const elIconeFa = document.getElementById("iconeDestaqueFa"); 
             const txtExtensao = document.getElementById("txtDestaqueExt");
             
-            elImagem.classList.add("hidden"); 
-            elIframe.classList.add("hidden");
-            elIconeArea.classList.remove("flex"); 
-            elIconeArea.classList.add("hidden");
+            if (elImagem) elImagem.classList.add("hidden"); 
+            if (elIframe) elIframe.classList.add("hidden");
+            if (elIconeArea) { elIconeArea.classList.remove("flex"); elIconeArea.classList.add("hidden"); }
             
             if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'imagem'].includes(tp)) { 
-                elImagem.src = url; 
-                elImagem.classList.remove("hidden"); 
+                if (elImagem) { elImagem.src = url; elImagem.classList.remove("hidden"); }
             } else if (['pdf', 'xls', 'xlsx', 'doc', 'docx', 'csv'].includes(tp)) {
-                elIframe.src = `https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`;
-                elIframe.classList.remove("hidden");
+                if (elIframe) { elIframe.src = `https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`; elIframe.classList.remove("hidden"); }
             } else { 
-                elIconeArea.classList.remove("hidden"); 
-                elIconeArea.classList.add("flex"); 
-                txtExtensao.innerText = `Arquivo ${tp.toUpperCase()}`; 
-                if (tp === 'pdf') { elIconeFa.className = "fas fa-file-pdf text-6xl text-red-500"; } 
-                else if (['xls', 'xlsx', 'csv'].includes(tp)) { elIconeFa.className = "fas fa-file-excel text-6xl text-green-500"; } 
-                else if (['doc', 'docx'].includes(tp)) { elIconeFa.className = "fas fa-file-word text-6xl text-blue-500"; } 
-                else { elIconeFa.className = "fas fa-file-alt text-6xl text-purple-500"; } 
+                if (elIconeArea) { elIconeArea.classList.remove("hidden"); elIconeArea.classList.add("flex"); }
+                if (txtExtensao) txtExtensao.innerText = `Arquivo ${tp.toUpperCase()}`; 
+                if (elIconeFa) {
+                    if (tp === 'pdf') { elIconeFa.className = "fas fa-file-pdf text-6xl text-red-500"; } 
+                    else if (['xls', 'xlsx', 'csv'].includes(tp)) { elIconeFa.className = "fas fa-file-excel text-6xl text-green-500"; } 
+                    else if (['doc', 'docx'].includes(tp)) { elIconeFa.className = "fas fa-file-word text-6xl text-blue-500"; } 
+                    else { elIconeFa.className = "fas fa-file-alt text-6xl text-purple-500"; } 
+                }
             }
             
-            cancelarEdicaoNome();
+            window.cancelarEdicaoNome();
             const modal = document.getElementById("modalVisualizacao"); const content = document.getElementById("modalVisualizacaoContent");
-            modal.classList.remove("hidden"); modal.classList.add("flex");
-            setTimeout(() => { content.classList.remove("scale-95", "opacity-0"); content.classList.add("scale-100", "opacity-100"); }, 10);
+            if (modal && content) {
+                modal.classList.remove("hidden"); modal.classList.add("flex");
+                setTimeout(() => { content.classList.remove("scale-95", "opacity-0"); content.classList.add("scale-100", "opacity-100"); }, 10);
+            }
         };
 
         window.fecharModalVisualizacao = function() {
             const modal = document.getElementById("modalVisualizacao"); const content = document.getElementById("modalVisualizacaoContent");
-            content.classList.remove("scale-100", "opacity-100"); content.classList.add("scale-95", "opacity-0");
-            setTimeout(() => { 
-                modal.classList.remove("flex"); modal.classList.add("hidden"); 
-                document.getElementById("imagemEmDestaque").src = ""; 
-                document.getElementById("iframePreview").src = ""; 
-            }, 200);
+            if (modal && content) {
+                content.classList.remove("scale-100", "opacity-100"); content.classList.add("scale-95", "opacity-0");
+                setTimeout(() => { 
+                    modal.classList.remove("flex"); modal.classList.add("hidden"); 
+                    const elImg = document.getElementById("imagemEmDestaque"); if (elImg) elImg.src = ""; 
+                    const elIf = document.getElementById("iframePreview"); if (elIf) elIf.src = ""; 
+                }, 200);
+            }
         };
 
         window.baixarAnexoAtivo = async function() {
-            const btnBaixar = document.getElementById("btnBaixarAnexo"); const htmlOriginal = btnBaixar.innerHTML;
-            btnBaixar.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Preparando...`;
+            const btnBaixar = document.getElementById("btnBaixarAnexo"); 
+            const htmlOriginal = btnBaixar ? btnBaixar.innerHTML : "";
+            if (btnBaixar) btnBaixar.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Preparando...`;
             try {
                 const resposta = await fetch(window.urlImagemAtiva); const blob = await resposta.blob(); const urlBlob = window.URL.createObjectURL(blob);
                 const a = document.createElement('a'); a.style.display = 'none'; a.href = urlBlob;
                 const tp = window.tipoAnexoAtivo.toLowerCase(); let extensao = `.${tp}`; if (tp === 'imagem') extensao = '.jpg';
-                let nomeLimpo = document.getElementById("tituloImagemCard").innerText.replace(/[^a-zA-Z0-9.\- ()]/g, ""); a.download = nomeLimpo + extensao;
+                const tCard = document.getElementById("tituloImagemCard");
+                let nomeLimpo = tCard ? tCard.innerText.replace(/[^a-zA-Z0-9.\- ()]/g, "") : "arquivo"; a.download = nomeLimpo + extensao;
                 document.body.appendChild(a); a.click();
                 setTimeout(() => { if (document.body.contains(a)) document.body.removeChild(a); window.URL.revokeObjectURL(urlBlob); }, 2000);
             } catch (erro) { window.open(window.urlImagemAtiva, "_blank"); }
-            btnBaixar.innerHTML = htmlOriginal;
+            if (btnBaixar) btnBaixar.innerHTML = htmlOriginal;
         };
 
         window.executarExclusaoDisfarçada = function() {
-            const nomeArquivo = document.getElementById("tituloImagemCard").innerText;
+            const tCard = document.getElementById("tituloImagemCard");
+            const nomeArquivo = tCard ? tCard.innerText : "";
             if (!confirm(`⚠️ Tem certeza de que deseja excluir o anexo "${nomeArquivo}"?`)) return;
             if (perfilUsuario === "administrador") {
-                remove(dbRef(db, 'arquivos_anexos/' + window.idImagemAtiva)).then(() => { fecharModalVisualizacao(); }).catch(err => alert("Erro ao excluir: " + err.message));
+                remove(dbRef(db, 'arquivos_anexos/' + window.idImagemAtiva)).then(() => { window.fecharModalVisualizacao(); }).catch(err => alert("Erro ao excluir: " + err.message));
             } else {
                 update(dbRef(db, 'arquivos_anexos/' + window.idImagemAtiva), { statusExclusao: "pendente_aprovacao", solicitadoPor: usuarioLogado }).then(() => {
                     push(dbRef(db, 'notificacoes_sistema'), { titulo: "Solicitação de Exclusão de Anexo", mensagem: `O usuário @${usuarioLogado} solicitou a exclusão do anexo "${nomeArquivo}".`, tipo: "alerta", usuarioSolicitante: usuarioLogado, enviadoPorUid: uidUsuarioLogado, idAnexo: window.idImagemAtiva, timestamp: Date.now(), data: Date.now() });
-                    fecharModalVisualizacao();
+                    window.fecharModalVisualizacao();
                 }).catch(err => alert("Erro ao processar: " + err.message));
             }
         };
 
-        window.abrirEdicaoNome = function() { document.getElementById("tituloImagemCard").classList.add("hidden"); document.getElementById("areaEdicaoNome").classList.remove("hidden"); document.getElementById("areaEdicaoNome").classList.add("flex"); };
-        window.cancelarEdicaoNome = function() { document.getElementById("areaEdicaoNome").classList.add("hidden"); document.getElementById("areaEdicaoNome").classList.remove("flex"); document.getElementById("tituloImagemCard").classList.remove("hidden"); };
-        window.salvarNovoNome = function() {
-            const novoNome = document.getElementById("inputEdicaoNome").value.trim();
-            if (!novoNome) return alert("⚠️ Digite um nome válido!");
-            const btnSalvar = document.getElementById("btnSalvarEdicao"); btnSalvar.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Salvando...`; btnSalvar.disabled = true;
-            update(dbRef(db, 'arquivos_anexos/' + window.idImagemAtiva), { nome: novoNome }).then(() => { document.getElementById("tituloImagemCard").innerText = novoNome; cancelarEdicaoNome(); btnSalvar.innerHTML = `<i class="fas fa-save"></i> Salvar`; btnSalvar.disabled = false; }).catch(erro => { alert("Erro ao salvar o nome: " + erro.message); btnSalvar.innerHTML = `<i class="fas fa-save"></i> Salvar`; btnSalvar.disabled = false; });
+        window.abrirEdicaoNome = function() {
+            const tCard = document.getElementById("tituloImagemCard"); if (tCard) tCard.classList.add("hidden");
+            const aEd = document.getElementById("areaEdicaoNome"); if (aEd) { aEd.classList.remove("hidden"); aEd.classList.add("flex"); }
         };
 
-        window.abrirModalNotificacoes = function() { const modal = document.getElementById("modalNotificacoes"); const content = document.getElementById("modalNotificacoesContent"); modal.classList.remove("hidden"); modal.classList.add("flex"); setTimeout(() => { content.classList.remove("scale-95", "opacity-0"); content.classList.add("scale-100", "opacity-100"); }, 10); };
-        window.fecharModalNotificacoes = function() { const modal = document.getElementById("modalNotificacoes"); const content = document.getElementById("modalNotificacoesContent"); content.classList.remove("scale-100", "opacity-100"); content.classList.add("scale-95", "opacity-0"); setTimeout(() => { modal.classList.remove("flex"); modal.classList.add("hidden"); }, 200); };
-        
+        window.cancelarEdicaoNome = function() {
+            const aEd = document.getElementById("areaEdicaoNome"); if (aEd) { aEd.classList.add("hidden"); aEd.classList.remove("flex"); }
+            const tCard = document.getElementById("tituloImagemCard"); if (tCard) tCard.classList.remove("hidden");
+        };
+
+        window.salvarNovoNome = function() {
+            const inEd = document.getElementById("inputEdicaoNome");
+            const novoNome = inEd ? inEd.value.trim() : "";
+            if (!novoNome) return alert("⚠️ Digite um nome válido!");
+            
+            const btnSalvar = document.getElementById("btnSalvarEdicao"); 
+            if (btnSalvar) { btnSalvar.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Salvando...`; btnSalvar.disabled = true; }
+            
+            update(dbRef(db, 'arquivos_anexos/' + window.idImagemAtiva), { nome: novoNome }).then(() => { 
+                const tCard = document.getElementById("tituloImagemCard"); if (tCard) tCard.innerText = novoNome; 
+                window.cancelarEdicaoNome(); 
+                if (btnSalvar) { btnSalvar.innerHTML = `<i class="fas fa-save"></i> Salvar`; btnSalvar.disabled = false; }
+            }).catch(erro => { 
+                alert("Erro ao salvar o nome: " + erro.message); 
+                if (btnSalvar) { btnSalvar.innerHTML = `<i class="fas fa-save"></i> Salvar`; btnSalvar.disabled = false; }
+            });
+        };
+
+        window.abrirModalNotificacoes = function() { 
+            const modal = document.getElementById("modalNotificacoes"); const content = document.getElementById("modalNotificacoesContent"); 
+            if (modal && content) { modal.classList.remove("hidden"); modal.classList.add("flex"); setTimeout(() => { content.classList.remove("scale-95", "opacity-0"); content.classList.add("scale-100", "opacity-100"); }, 10); }
+        };
+
+        window.fecharModalNotificacoes = function() { 
+            const modal = document.getElementById("modalNotificacoes"); const content = document.getElementById("modalNotificacoesContent"); 
+            if (modal && content) { content.classList.remove("scale-100", "opacity-100"); content.classList.add("scale-95", "opacity-0"); setTimeout(() => { modal.classList.remove("flex"); modal.classList.add("hidden"); }, 200); }
+        };
+
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 uidUsuarioLogado = user.uid;
@@ -1639,11 +1697,11 @@
             }
         });
 
-        // DISPARADORES SEGUROS CONTRA NULL
-        document.getElementById("inputBuscaAnexo")?.addEventListener("input", window.aplicarFiltrosNaGaleria);
-        document.getElementById("dataInicioFiltro")?.addEventListener("change", window.aplicarFiltrosNaGaleria);
-        document.getElementById("dataFimFiltro")?.addEventListener("change", window.aplicarFiltrosNaGaleria);
-        document.getElementById("filtroUsuario")?.addEventListener("change", window.aplicarFiltrosNaGaleria);
+        // DISPARADORES SEGUROS
+        escutarEventoSeguro("inputBuscaAnexo", "input", window.aplicarFiltrosNaGaleria);
+        escutarEventoSeguro("dataInicioFiltro", "change", window.aplicarFiltrosNaGaleria);
+        escutarEventoSeguro("dataFimFiltro", "change", window.aplicarFiltrosNaGaleria);
+        escutarEventoSeguro("filtroUsuario", "change", window.aplicarFiltrosNaGaleria);
 
         const dispararRenderNotif = () => {
             if (typeof window.renderizarNotificacoesFiltradas === 'function') {
@@ -1651,10 +1709,10 @@
             }
         };
 
-        document.getElementById("inputBuscaNotif")?.addEventListener("input", dispararRenderNotif);
-        document.getElementById("dataInicioFiltroNotif")?.addEventListener("change", dispararRenderNotif);
-        document.getElementById("dataFimFiltroNotif")?.addEventListener("change", dispararRenderNotif);
-        document.getElementById("filtroUsuarioNotif")?.addEventListener("change", dispararRenderNotif);
+        escutarEventoSeguro("inputBuscaNotif", "input", dispararRenderNotif);
+        escutarEventoSeguro("dataInicioFiltroNotif", "change", dispararRenderNotif);
+        escutarEventoSeguro("dataFimFiltroNotif", "change", dispararRenderNotif);
+        escutarEventoSeguro("filtroUsuarioNotif", "change", dispararRenderNotif);
     </script>
 </body>
 </html>
