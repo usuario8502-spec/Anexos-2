@@ -21,7 +21,7 @@
                 name: "Sistema de Anexos",
                 short_name: "Anexos",
                 description: "Gestão e Escaneamento de Anexos e Documentos",
-                start_url: "./",
+                start_url: window.location.href,
                 display: "standalone",
                 background_color: "#030712",
                 theme_color: "#030712",
@@ -55,7 +55,6 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
         .popup-blur { backdrop-filter: blur(5px); }
         
-        /* ESTILOS DO CROPPER CONFORME CÓDIGO ORIGINAL */
         .cropper-view-box { outline: 3px solid rgba(59, 130, 246, 0.9) !important; border-radius: 4px; }
         .cropper-line { background-color: transparent !important; }
         .cropper-line.line-e { width: 40px !important; right: -20px !important; }
@@ -116,6 +115,35 @@
 </head>
 <body class="bg-gray-950 text-gray-100 font-sans min-h-screen flex flex-col relative pb-24">
 
+    <!-- MODAL DE LOGIN EMBUTIDO -->
+    <div id="modalLoginApp" class="fixed inset-0 bg-black/95 popup-blur z-[100] flex items-center justify-center p-4">
+        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-sm shadow-2xl flex flex-col gap-4">
+            <div class="text-center flex flex-col items-center gap-2">
+                <div class="w-12 h-12 rounded-full bg-blue-600/20 border border-blue-500/40 flex items-center justify-center text-blue-500 text-xl">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h2 class="text-lg font-bold text-white">Acessar o Sistema</h2>
+                <p class="text-xs text-gray-400">Entre com sua conta do Firebase para visualizar e gerenciar anexos.</p>
+            </div>
+
+            <form onsubmit="window.executarLoginFirebase(event)" class="flex flex-col gap-3">
+                <div class="flex flex-col gap-1">
+                    <label class="text-[10px] text-gray-400 font-bold uppercase">E-mail</label>
+                    <input type="email" id="loginEmail" required placeholder="seu@email.com" class="p-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-xs focus:outline-none focus:border-blue-500">
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label class="text-[10px] text-gray-400 font-bold uppercase">Senha</label>
+                    <input type="password" id="loginSenha" required placeholder="******" class="p-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-xs focus:outline-none focus:border-blue-500">
+                </div>
+
+                <div class="flex gap-2 mt-2">
+                    <button type="submit" id="btnEntrarLogin" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl font-bold text-xs transition">Entrar</button>
+                    <button type="button" onclick="window.executarCadastroFirebase()" id="btnCadastrarLogin" class="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 py-3 rounded-xl font-bold text-xs transition">Cadastrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- OVERLAY E MENU LATERAL (SIDEBAR) -->
     <div id="overlaySidebar" onclick="window.toggleSidebar(false)" class="fixed inset-0 bg-black/70 popup-blur z-50 hidden transition-opacity"></div>
     <aside id="sidebar" class="fixed top-0 left-0 w-72 h-full bg-gray-900 border-r border-gray-800 z-50 transform -translate-x-full transition-transform duration-300 flex flex-col justify-between shadow-2xl">
@@ -158,14 +186,12 @@
     </header>
 
     <main class="flex-1 max-w-5xl w-full mx-auto p-4 flex flex-col gap-6">
-        
         <!-- Barra de Filtros -->
         <section class="bg-gray-900 border border-gray-800 p-4 rounded-xl shadow-lg flex flex-col gap-3">
             <div class="relative w-full">
                 <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500"></i>
                 <input type="text" id="inputBuscaAnexo" placeholder="Buscar por nome, data (DD/MM) ou mês (MM/AAAA)..." class="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:border-blue-500 focus:outline-none text-sm transition-all">
             </div>
-            
             <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                 <div class="flex flex-col gap-1">
                     <label class="text-[10px] text-gray-400 font-bold uppercase">Data Início</label>
@@ -218,7 +244,6 @@
     <!-- MODAL DE VISUALIZAÇÃO E EDIÇÃO DO ANEXO -->
     <div id="modalVisualizacao" class="fixed inset-0 bg-black/90 popup-blur hidden items-center justify-center p-4 z-50">
         <div class="bg-gray-900 rounded-xl border border-gray-800 p-6 w-full max-w-lg shadow-2xl flex flex-col gap-4 transform transition-all scale-95 opacity-0" id="modalVisualizacaoContent">
-            
             <div class="flex justify-between items-start border-b border-gray-800 pb-3 gap-3">
                 <h3 class="text-lg font-bold text-white flex-1 leading-tight break-words" id="tituloImagemCard">Carregando...</h3>
                 <button onclick="window.fecharModalVisualizacao()" class="text-gray-500 hover:text-white transition text-2xl p-1 leading-none"><i class="fas fa-times"></i></button>
@@ -233,11 +258,9 @@
                 </div>
             </div>
 
-            <!-- Preview Visual Dinâmico -->
             <div class="w-full h-64 sm:h-80 bg-gray-950 rounded-lg border border-gray-800 flex items-center justify-center overflow-hidden relative shadow-inner">
                 <img id="imagemEmDestaque" src="" class="max-w-full max-h-full object-contain hidden">
                 <iframe id="iframePreview" src="" class="w-full h-full hidden bg-white rounded-lg"></iframe>
-
                 <div id="iconeDestaque" class="hidden flex-col items-center justify-center gap-3 text-gray-500">
                     <i id="iconeDestaqueFa" class="fas fa-file text-6xl"></i>
                     <span id="txtDestaqueExt" class="text-sm font-bold uppercase">Arquivo</span>
@@ -252,10 +275,9 @@
         </div>
     </div>
 
-    <!-- MODAL DE UPLOAD (MÚLTIPLOS MÉTODOS E LOTES) -->
+    <!-- MODAL DE UPLOAD DE ARQUIVOS -->
     <div id="modalUpload" class="fixed inset-0 bg-black/80 popup-blur hidden items-center justify-center p-4 z-50 overflow-y-auto">
         <div class="bg-gray-900 rounded-xl border border-gray-800 p-6 w-full max-w-md shadow-2xl flex flex-col gap-4 transform transition-all scale-95 opacity-0 my-auto" id="modalUploadContent">
-            
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
                 <h3 class="text-lg font-bold text-white"><i class="fas fa-cloud-upload-alt text-blue-500"></i> Enviar Arquivos</h3>
                 <button onclick="window.fecharModalUpload()" class="text-gray-500 hover:text-white transition text-xl"><i class="fas fa-times"></i></button>
@@ -268,18 +290,14 @@
                 <div id="areaEscolhaModo" class="grid grid-cols-2 gap-2 mt-2">
                     <button onclick="document.getElementById('inputArquivoCamera').click()" class="bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 py-3 rounded-xl flex items-center justify-center gap-2 transition"><i class="fas fa-camera text-blue-400"></i><span class="text-[11px] font-bold">Câmera</span></button>
                     <button onclick="document.getElementById('inputArquivoGaleria').click()" class="bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 py-3 rounded-xl flex items-center justify-center gap-2 transition"><i class="fas fa-images text-blue-400"></i><span class="text-[11px] font-bold">Múltiplas Fotos</span></button>
-                    
                     <button onclick="window.abrirModalOrigemScanner()" class="col-span-2 sm:col-span-1 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 py-3 rounded-xl flex items-center justify-center gap-2 transition relative overflow-hidden"><div class="absolute inset-0 bg-red-500/10 opacity-50"></div><i class="fas fa-file-pdf text-red-500"></i><span class="text-[11px] font-bold">Escanear Documento</span></button>
-                    
                     <button onclick="document.getElementById('inputArquivoGenerico').click()" class="col-span-2 sm:col-span-1 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 py-3 rounded-xl flex items-center justify-center gap-2 transition"><i class="fas fa-file-upload text-purple-400"></i><span class="text-[11px] font-bold">Outros Arquivos</span></button>
                 </div>
 
                 <input type="file" id="inputArquivoCamera" accept="image/*" capture="environment" class="hidden" onchange="window.processarArquivosLote(this, 'camera')">
                 <input type="file" id="inputArquivoGaleria" accept="image/*" multiple class="hidden" onchange="window.processarArquivosLote(this, 'galeria')">
-                
                 <input type="file" id="inputArquivoScannerCamera" accept="image/*" capture="environment" class="hidden" onchange="window.abrirModoScanner(this)">
                 <input type="file" id="inputArquivoScannerGaleria" accept="image/*" class="hidden" onchange="window.abrirModoScanner(this)">
-                
                 <input type="file" id="inputArquivoGenerico" class="hidden" accept="*/*" multiple onchange="window.processarArquivosLote(this, 'generico')">
 
                 <!-- PREVIEW DIVERSOS -->
@@ -292,7 +310,7 @@
                     <button onclick="window.acionarMaisItens()" class="w-full bg-gray-800 hover:bg-gray-700 border border-dashed border-gray-600 text-gray-300 py-3 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition"><i class="fas fa-plus"></i> Adicionar Mais Itens</button>
                 </div>
 
-                <!-- PREVIEW SCANNER ORIGINAL (CARRINHO COM RE-EDIÇÃO) -->
+                <!-- PREVIEW SCANNER -->
                 <div id="areaPreviewScanner" class="hidden flex-col gap-3 mt-2">
                     <div class="flex justify-between items-center border-b border-gray-800 pb-2">
                         <span class="text-xs font-bold text-red-400"><i class="fas fa-file-pdf"></i> Páginas Escaneadas</span>
@@ -304,7 +322,6 @@
                         <button onclick="window.abrirModalOrigemScanner()" class="bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 py-2.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition"><i class="fas fa-plus"></i> Add Pág.</button>
                     </div>
                 </div>
-
             </div>
 
             <div id="containerProgresso" class="hidden w-full bg-gray-950 rounded-full h-3 border border-gray-800 mt-2">
@@ -338,7 +355,7 @@
         </div>
     </div>
 
-    <!-- MODAL 1: CROPPER ORIGINAL COM NIVELAMENTO E ROTAÇÃO -->
+    <!-- MODAL 1: CROPPER -->
     <div id="modalCropperScanner" class="fixed inset-0 bg-gray-950 z-[60] hidden flex-col">
         <div class="flex justify-between items-center bg-gray-900 border-b border-gray-800 p-4 shadow-md">
             <h3 class="text-white font-bold text-sm flex items-center gap-2"><i class="fas fa-crop-alt text-blue-500"></i> Ajustar Bordas</h3>
@@ -368,7 +385,7 @@
         </div>
     </div>
 
-    <!-- MODAL 2: APLICADOR DE FILTROS, CAIXAS DE TEXTO MÚLTIPLAS E ASSINATURA -->
+    <!-- MODAL 2: APLICADOR DE FILTROS -->
     <div id="modalFiltrosScanner" class="fixed inset-0 bg-gray-950 z-[70] hidden flex-col overflow-y-auto">
         <div class="flex justify-between items-center bg-gray-900 border-b border-gray-800 p-4 shadow-md">
             <button onclick="window.voltarParaCropper()" class="text-gray-400 hover:text-white"><i class="fas fa-arrow-left text-xl"></i></button>
@@ -396,7 +413,7 @@
                 </div>
             </div>
 
-            <!-- FILTROS BASE ORIGINAIS -->
+            <!-- FILTROS BASE -->
             <div class="flex overflow-x-auto gap-3 px-4 custom-scrollbar pb-1 mt-1">
                 <button id="btnFiltro_original" onclick="window.aplicarFiltroBase('original')" class="flex flex-col items-center gap-1.5 min-w-[70px]">
                     <div class="w-10 h-10 bg-gray-800 border-2 border-gray-600 rounded flex items-center justify-center text-gray-400 transition" id="iconFiltro_original"><i class="fas fa-image text-sm"></i></div>
@@ -443,15 +460,15 @@
                             </div>
                             <div class="flex items-center gap-2">
                                 <label class="text-[10px] text-gray-400 font-bold uppercase whitespace-nowrap">Tamanho:</label>
-                                <input type="range" id="sliderTamanhoFonte" min="16" max="120" value="36" oninput="window.atualizarTamanhoCaixaAtiva()">
-                                <span id="lblTamanhoFonte" class="text-xs font-bold text-white w-8">36px</span>
+                                <input type="range" id="sliderTamanhoFonte" min="12" max="72" value="24" oninput="window.atualizarTamanhoCaixaAtiva()">
+                                <span id="lblTamanhoFonte" class="text-xs font-bold text-white w-8">24px</span>
                             </div>
                         </div>
 
                         <div class="flex items-center gap-2">
                             <label class="text-[10px] text-gray-400 font-bold uppercase whitespace-nowrap">Largura Caixa:</label>
-                            <input type="range" id="sliderLarguraCaixaTexto" min="150" max="1200" value="500" oninput="window.atualizarLarguraCaixaAtiva()">
-                            <span id="lblLarguraCaixaTexto" class="text-xs font-bold text-white w-10">500px</span>
+                            <input type="range" id="sliderLarguraCaixaTexto" min="100" max="1000" value="400" oninput="window.atualizarLarguraCaixaAtiva()">
+                            <span id="lblLarguraCaixaTexto" class="text-xs font-bold text-white w-10">400px</span>
                         </div>
                     </div>
 
@@ -467,7 +484,7 @@
                     <span class="text-xs font-bold text-indigo-400 flex items-center gap-1.5"><i class="fas fa-pen-nib"></i> Ajustar Assinatura (Arraste no canvas)</span>
                     <div class="flex items-center gap-3">
                         <label class="text-[10px] text-gray-400 font-bold uppercase whitespace-nowrap">Tamanho/Escala:</label>
-                        <input type="range" id="sliderEscalaAssinatura" min="30" max="200" value="70" oninput="window.renderizarFiltroAtual(true)">
+                        <input type="range" id="sliderEscalaAssinatura" min="20" max="100" value="50" oninput="window.renderizarFiltroAtual(true)">
                         <button onclick="window.removerAssinaturaCanvas()" class="text-red-400 hover:text-red-300 text-xs p-1"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>
@@ -502,14 +519,14 @@
         </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL E FIREBASE COM SEGURANÇA CONTRA NULL -->
+    <!-- SCRIPT PRINCIPAL E FIREBASE COM LEITURA INDEPENDENTE -->
     <script type="module">
         import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getDatabase, ref as dbRef, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
         import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
-        // CREDENCIAIS ATUALIZADAS (PROJETO: anexos-2)
+        // CREDENCIAIS DO FIREBASE (PROJETO: anexos-2)
         const firebaseConfig = {
             apiKey: "AIzaSyCQ8--X39oK3BnwNES7zDklKnWP0_4hEas",
             authDomain: "anexos-2.firebaseapp.com",
@@ -563,6 +580,51 @@
             if (el) el.addEventListener(evento, callback);
         }
 
+        // FUNÇÕES DE LOGIN/CADASTRO DO FIREBASE
+        window.executarLoginFirebase = function(e) {
+            e.preventDefault();
+            const email = document.getElementById("loginEmail")?.value.trim();
+            const senha = document.getElementById("loginSenha")?.value.trim();
+            const btn = document.getElementById("btnEntrarLogin");
+            if (btn) btn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Entrando...`;
+
+            signInWithEmailAndPassword(auth, email, senha)
+                .then(() => {
+                    const modalLogin = document.getElementById("modalLoginApp");
+                    if (modalLogin) modalLogin.classList.add("hidden");
+                })
+                .catch((error) => {
+                    alert("Erro ao entrar: " + error.message);
+                    if (btn) btn.innerText = "Entrar";
+                });
+        };
+
+        window.executarCadastroFirebase = function() {
+            const email = document.getElementById("loginEmail")?.value.trim();
+            const senha = document.getElementById("loginSenha")?.value.trim();
+            if (!email || !senha) return alert("Preencha o e-mail e a senha para cadastrar.");
+
+            const btn = document.getElementById("btnCadastrarLogin");
+            if (btn) btn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Cadastrando...`;
+
+            createUserWithEmailAndPassword(auth, email, senha)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    const username = user.email.split('@')[0];
+                    update(dbRef(db, 'usuarios_sistema/' + user.uid), {
+                        username: username,
+                        perfil: "operador"
+                    }).then(() => {
+                        const modalLogin = document.getElementById("modalLoginApp");
+                        if (modalLogin) modalLogin.classList.add("hidden");
+                    });
+                })
+                .catch((error) => {
+                    alert("Erro ao cadastrar: " + error.message);
+                    if (btn) btn.innerText = "Cadastrar";
+                });
+        };
+
         window.toggleSidebar = function(abrir) {
             const sidebar = document.getElementById("sidebar");
             const overlay = document.getElementById("overlaySidebar");
@@ -578,7 +640,10 @@
         };
 
         window.fazerLogout = function() {
-            signOut(auth).then(() => alert("Logout realizado!"));
+            signOut(auth).then(() => {
+                const modalLogin = document.getElementById("modalLoginApp");
+                if (modalLogin) modalLogin.classList.remove("hidden");
+            });
         };
 
         window.abrirModalUpload = function() {
@@ -708,7 +773,6 @@
             const ctxBruto = canvasCortado.getContext('2d');
             canvasOriginalContextData = ctxBruto.getImageData(0, 0, larguraCrop, alturaCrop);
 
-            // CENTRALIZAÇÃO INICIAL DA CAIXA DE TEXTO E ASSINATURA
             let larguraCaixaPadrao = Math.min(500, larguraCrop * 0.7);
             caixasTexto = [{
                 id: Date.now(),
@@ -937,10 +1001,8 @@
                 if (lblL) lblL.innerText = caixasTexto[indiceCaixaTextoAtiva].larguraCaixa + "px";
             }
 
-            // 1. Imagem Base
             ctxLive.putImageData(canvasOriginalContextData, 0, 0);
             
-            // 2. Filtros
             if (window.filtroAtivo !== 'original' || valBrilho !== 0 || valContraste !== 0) {
                 const imgData = ctxLive.getImageData(0, 0, larguraCrop, alturaCrop);
                 const data = imgData.data;
@@ -980,7 +1042,6 @@
                 ctxLive.putImageData(imgData, 0, 0);
             }
 
-            // 3. Renderiza Caixas de Texto
             caixasTexto.forEach((caixa, index) => {
                 if (caixa.texto.trim() !== "") {
                     caixa.dimensaoCalculada = desenharTextoEstiloDocumentoAutoAjustavel(
@@ -998,7 +1059,6 @@
                 }
             });
 
-            // 4. Renderiza Assinatura
             if (imgAssinaturaElemento) {
                 const slEsc = document.getElementById("sliderEscalaAssinatura");
                 let escala = slEsc ? parseInt(slEsc.value) / 100 : 0.7;
@@ -1191,7 +1251,6 @@
             window.renderizarCarrinhoScanner();
         };
 
-        // CARRINHO DE PÁGINAS ESCANEADAS COM ÍCONE DE EDITAR (LÁPIS)
         window.renderizarCarrinhoScanner = function() {
             const areaEscolha = document.getElementById("areaEscolhaModo");
             const areaPrev = document.getElementById("areaPreviewScanner");
@@ -1748,8 +1807,13 @@
             if (modal && content) { content.classList.remove("scale-100", "opacity-100"); content.classList.add("scale-95", "opacity-0"); setTimeout(() => { modal.classList.remove("flex"); modal.classList.add("hidden"); }, 200); }
         };
 
+        // CARREGA A GALERIA DE ANEXOS CONTINUAMENTE DO BANCO
+        carregarGaleriaDeAnexos();
+
         onAuthStateChanged(auth, (user) => {
+            const modalLogin = document.getElementById("modalLoginApp");
             if (user) {
+                if (modalLogin) modalLogin.classList.add("hidden");
                 uidUsuarioLogado = user.uid;
                 const fallbackUsername = user.email.split('@')[0];
 
@@ -1783,17 +1847,17 @@
                         if (areaSino) areaSino.classList.add("hidden");
                         if (espacador) espacador.classList.remove("hidden");
                     }
-                    carregarGaleriaDeAnexos();
                 });
             } else {
+                if (modalLogin) modalLogin.classList.remove("hidden");
                 const elSidebarNome = document.getElementById("sidebarNomeUsuario");
                 const elSidebarPerfil = document.getElementById("sidebarPerfilUsuario");
-                if (elSidebarNome) elSidebarNome.innerText = "@VisitanteCodePen";
+                if (elSidebarNome) elSidebarNome.innerText = "@Visitante";
                 if (elSidebarPerfil) elSidebarPerfil.innerText = "Operador";
             }
         });
 
-        // DISPARADORES SEGUROS CONTRA NULL
+        // DISPARADORES SEGUROS
         escutarEventoSeguro("inputBuscaAnexo", "input", window.aplicarFiltrosNaGaleria);
         escutarEventoSeguro("dataInicioFiltro", "change", window.aplicarFiltrosNaGaleria);
         escutarEventoSeguro("dataFimFiltro", "change", window.aplicarFiltrosNaGaleria);
