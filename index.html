@@ -443,13 +443,13 @@
                     <div class="flex justify-between text-[10px] text-gray-400 font-bold uppercase tracking-wide">
                         <span><i class="fas fa-sun text-yellow-500"></i> Clarear Fundo</span>
                     </div>
-                    <input type="range" id="sliderBrilho" min="-100" max="150" value="0" oninput="window.renderizarFiltroAtual(true)">
+                    <input type="range" id="sliderBrilho" min="-100" max="150" value="0" oninput="window.atualizarFiltrosComCache()">
                 </div>
                 <div class="flex flex-col gap-1">
                     <div class="flex justify-between text-[10px] text-gray-400 font-bold uppercase tracking-wide">
                         <span><i class="fas fa-adjust text-gray-300"></i> Escurecer Texto</span>
                     </div>
-                    <input type="range" id="sliderContraste" min="-100" max="150" value="0" oninput="window.renderizarFiltroAtual(true)">
+                    <input type="range" id="sliderContraste" min="-100" max="150" value="0" oninput="window.atualizarFiltrosComCache()">
                 </div>
             </div>
 
@@ -477,7 +477,7 @@
                 </button>
             </div>
 
-            <!-- CONTROLE DE CAIXAS DE TEXTO MÚLTIPLAS COM BOTÃO NEGRITO -->
+            <!-- CONTROLE DE CAIXAS DE TEXTO MÚLTIPLAS COM BOTÃO NEGRITO E ROTAÇÃO -->
             <div class="px-4 mt-2">
                 <div class="bg-gray-800/60 p-3 rounded-xl border border-gray-700/60 flex flex-col gap-3">
                     <div class="flex justify-between items-center">
@@ -507,6 +507,12 @@
                         </div>
 
                         <div class="flex items-center gap-2">
+                            <label class="text-[10px] text-gray-400 font-bold uppercase whitespace-nowrap"><i class="fas fa-sync-alt text-blue-400"></i> Rotação:</label>
+                            <input type="range" id="sliderRotacaoTexto" min="0" max="360" value="0" oninput="window.atualizarRotacaoCaixaAtiva()">
+                            <span id="lblRotacaoTexto" class="text-xs font-bold text-white w-10">0°</span>
+                        </div>
+
+                        <div class="flex items-center gap-2">
                             <label class="text-[10px] text-gray-400 font-bold uppercase whitespace-nowrap">Largura Caixa:</label>
                             <input type="range" id="sliderLarguraCaixaTexto" min="100" max="1000" value="400" oninput="window.atualizarLarguraCaixaAtiva()">
                             <span id="lblLarguraCaixaTexto" class="text-xs font-bold text-white w-10">400px</span>
@@ -525,7 +531,7 @@
                     <span class="text-xs font-bold text-indigo-400 flex items-center gap-1.5"><i class="fas fa-pen-nib"></i> Ajustar Assinatura (Arraste no canvas)</span>
                     <div class="flex items-center gap-3">
                         <label class="text-[10px] text-gray-400 font-bold uppercase whitespace-nowrap">Tamanho/Escala:</label>
-                        <input type="range" id="sliderEscalaAssinatura" min="30" max="300" value="120" oninput="window.renderizarFiltroAtual(true)">
+                        <input type="range" id="sliderEscalaAssinatura" min="30" max="300" value="120" oninput="window.solicitarRenderizacaoSuperficial()">
                         <button onclick="window.removerAssinaturaCanvas()" class="text-red-400 hover:text-red-300 text-xs p-1" title="Remover Assinatura"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>
@@ -543,7 +549,7 @@
                     </div>
                     <div class="flex items-center gap-3 mt-1">
                         <label class="text-[10px] text-gray-400 font-bold uppercase whitespace-nowrap">Tamanho/Escala:</label>
-                        <input type="range" id="sliderEscalaCarimbo" min="20" max="250" value="85" oninput="window.renderizarFiltroAtual(true)">
+                        <input type="range" id="sliderEscalaCarimbo" min="20" max="250" value="85" oninput="window.solicitarRenderizacaoSuperficial()">
                         <button onclick="window.removerCarimboCanvas()" class="text-red-400 hover:text-red-300 text-xs p-1" title="Remover Carimbo"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>
@@ -581,7 +587,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL E FIREBASE COM ASSINATURA HD E CAMADAS DO CARIMBO -->
+    <!-- SCRIPT PRINCIPAL E FIREBASE COM PERFORMANCE ULTRA-SUAVE E ROTAÇÃO -->
     <script type="module">
         import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, setPersistence, browserSessionPersistence, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -642,6 +648,7 @@
 
         let cropperInstancia = null;
         let canvasOriginalContextData = null; 
+        let canvasFiltroCache = null; // CACHE DE PERFORMANCE DA IMAGEM
         let larguraCrop = 0;
         let alturaCrop = 0;
         window.filtroAtivo = 'pb'; 
@@ -660,6 +667,7 @@
 
         let elementoSendoArrastado = null;
         let offsetArrasto = { x: 0, y: 0 };
+        let renderFramePendente = false;
 
         let assinandoPad = false;
         let ctxAssinaturaPad = null;
@@ -670,7 +678,7 @@
             if (el) el.addEventListener(evento, callback);
         }
 
-        // ALTERA ORDEM DAS CAMADAS DO CARIMBO (FRENTE / TRÁS)
+        // ALTERA ORDEM DAS CAMADAS DO CARIMBO
         window.alterarOrdemCarimbo = function(direcao) {
             ordemCamadas = ordemCamadas.filter(c => c !== 'carimbo');
             if (direcao === 'tras') {
@@ -678,10 +686,10 @@
             } else {
                 ordemCamadas.push('carimbo');
             }
-            window.renderizarFiltroAtual(true);
+            window.solicitarRenderizacaoSuperficial();
         };
 
-        // GERADOR DO CARIMBO LIMPO (SEM A FRASE SOLICITADA)
+        // GERADOR DO CARIMBO VETORIAL
         function criarImagemCarimboVetor() {
             const canvasC = document.createElement('canvas');
             canvasC.width = 460;
@@ -694,7 +702,6 @@
             ctxC.strokeStyle = corCarimbo;
             ctxC.fillStyle = corCarimbo;
 
-            // Bordas Duplas
             ctxC.lineWidth = 5;
             ctxC.strokeRect(10, 10, canvasC.width - 20, canvasC.height - 20);
             ctxC.lineWidth = 2;
@@ -726,7 +733,7 @@
                 if (pCar) { pCar.classList.remove("hidden"); pCar.classList.add("flex"); }
                 const txtB = document.getElementById("txtBtnCarimbo");
                 if (txtB) txtB.innerText = "Reaplicar Carimbo";
-                window.renderizarFiltroAtual(true);
+                window.solicitarRenderizacaoSuperficial();
             };
         };
 
@@ -736,7 +743,7 @@
             if (pCar) { pCar.classList.add("hidden"); pCar.classList.remove("flex"); }
             const txtB = document.getElementById("txtBtnCarimbo");
             if (txtB) txtB.innerText = "Carimbar";
-            window.renderizarFiltroAtual(true);
+            window.solicitarRenderizacaoSuperficial();
         };
 
         // LOGIN RECONHECENDO USERNAME
@@ -1032,12 +1039,12 @@
                 cor: "#000000",
                 tamanhoFonte: 36,
                 negrito: false,
+                rotacao: 0,
                 larguraCaixa: larguraCaixaPadrao,
                 dimensaoCalculada: { w: larguraCaixaPadrao, h: 50 }
             }];
             indiceCaixaTextoAtiva = 0;
 
-            // LARGURA INICIAL DA ASSINATURA AUMENTADA
             let larguraAssPadrao = larguraCrop * 0.65;
             posicaoAssinatura = { x: (larguraCrop - larguraAssPadrao) / 2, y: (alturaCrop / 2) + 50 };
             imgAssinaturaElemento = null;
@@ -1071,6 +1078,11 @@
                 canvasLive.height = alturaCrop;
                 configurarEventosArrastoCanvas(canvasLive);
             }
+
+            // CRIA CANVAS AUXILIAR PARA CACHE DE FILTROS (MELHORIA DRÁSTICA DE PERFORMANCE)
+            canvasFiltroCache = document.createElement('canvas');
+            canvasFiltroCache.width = larguraCrop;
+            canvasFiltroCache.height = alturaCrop;
             
             sincronizarPainelComCaixaAtiva();
             window.aplicarFiltroBase('pb'); 
@@ -1103,7 +1115,7 @@
 
             const slB = document.getElementById("sliderBrilho"); if (slB) slB.value = 0;
             const slC = document.getElementById("sliderContraste"); if (slC) slC.value = (tipo === 'pb') ? 20 : 0; 
-            window.renderizarFiltroAtual(true);
+            window.atualizarFiltrosComCache();
         };
 
         window.adicionarNovaCaixaTexto = function() {
@@ -1115,13 +1127,14 @@
                 cor: "#000000",
                 tamanhoFonte: 36,
                 negrito: false,
+                rotacao: 0,
                 larguraCaixa: larguraCaixaPadrao,
                 dimensaoCalculada: { w: larguraCaixaPadrao, h: 50 }
             };
             caixasTexto.push(novaCaixa);
             indiceCaixaTextoAtiva = caixasTexto.length - 1;
             sincronizarPainelComCaixaAtiva();
-            window.renderizarFiltroAtual(true);
+            window.solicitarRenderizacaoSuperficial();
         };
 
         window.removerCaixaTextoAtiva = function() {
@@ -1129,7 +1142,7 @@
                 caixasTexto.splice(indiceCaixaTextoAtiva, 1);
                 indiceCaixaTextoAtiva = caixasTexto.length > 0 ? caixasTexto.length - 1 : null;
                 sincronizarPainelComCaixaAtiva();
-                window.renderizarFiltroAtual(true);
+                window.solicitarRenderizacaoSuperficial();
             }
         };
 
@@ -1137,7 +1150,19 @@
             if (indiceCaixaTextoAtiva !== null && caixasTexto[indiceCaixaTextoAtiva]) {
                 caixasTexto[indiceCaixaTextoAtiva].negrito = !caixasTexto[indiceCaixaTextoAtiva].negrito;
                 sincronizarPainelComCaixaAtiva();
-                window.renderizarFiltroAtual(true);
+                window.solicitarRenderizacaoSuperficial();
+            }
+        };
+
+        window.atualizarRotacaoCaixaAtiva = function() {
+            if (indiceCaixaTextoAtiva !== null && caixasTexto[indiceCaixaTextoAtiva]) {
+                const el = document.getElementById("sliderRotacaoTexto");
+                if (el) {
+                    caixasTexto[indiceCaixaTextoAtiva].rotacao = parseInt(el.value);
+                    const lbl = document.getElementById("lblRotacaoTexto");
+                    if (lbl) lbl.innerText = el.value + "°";
+                }
+                window.solicitarRenderizacaoSuperficial();
             }
         };
 
@@ -1154,6 +1179,8 @@
                 const inTxt = document.getElementById("inputTextoCanvas"); if (inTxt) inTxt.value = caixa.texto;
                 const corTxt = document.getElementById("corTextoCanvas"); if (corTxt) corTxt.value = caixa.cor;
                 const slFonte = document.getElementById("sliderTamanhoFonte"); if (slFonte) slFonte.value = caixa.tamanhoFonte;
+                const slRot = document.getElementById("sliderRotacaoTexto"); if (slRot) slRot.value = caixa.rotacao || 0;
+                const lblRot = document.getElementById("lblRotacaoTexto"); if (lblRot) lblRot.innerText = (caixa.rotacao || 0) + "°";
                 const slLarg = document.getElementById("sliderLarguraCaixaTexto"); 
                 if (slLarg) { slLarg.max = larguraCrop; slLarg.value = caixa.larguraCaixa; }
 
@@ -1176,7 +1203,7 @@
             if (indiceCaixaTextoAtiva !== null && caixasTexto[indiceCaixaTextoAtiva]) {
                 const el = document.getElementById("inputTextoCanvas");
                 if (el) caixasTexto[indiceCaixaTextoAtiva].texto = el.value;
-                window.renderizarFiltroAtual(true);
+                window.solicitarRenderizacaoSuperficial();
             }
         };
 
@@ -1184,7 +1211,7 @@
             if (indiceCaixaTextoAtiva !== null && caixasTexto[indiceCaixaTextoAtiva]) {
                 const el = document.getElementById("corTextoCanvas");
                 if (el) caixasTexto[indiceCaixaTextoAtiva].cor = el.value;
-                window.renderizarFiltroAtual(true);
+                window.solicitarRenderizacaoSuperficial();
             }
         };
 
@@ -1192,7 +1219,7 @@
             if (indiceCaixaTextoAtiva !== null && caixasTexto[indiceCaixaTextoAtiva]) {
                 const el = document.getElementById("sliderTamanhoFonte");
                 if (el) caixasTexto[indiceCaixaTextoAtiva].tamanhoFonte = parseInt(el.value);
-                window.renderizarFiltroAtual(true);
+                window.solicitarRenderizacaoSuperficial();
             }
         };
 
@@ -1200,13 +1227,12 @@
             if (indiceCaixaTextoAtiva !== null && caixasTexto[indiceCaixaTextoAtiva]) {
                 const el = document.getElementById("sliderLarguraCaixaTexto");
                 if (el) caixasTexto[indiceCaixaTextoAtiva].larguraCaixa = parseInt(el.value);
-                window.renderizarFiltroAtual(true);
+                window.solicitarRenderizacaoSuperficial();
             }
         };
 
         function desenharTextoEstiloDocumentoAutoAjustavel(ctx, caixa, x, y) {
-            ctx.fillStyle = caixa.cor;
-            ctx.textBaseline = "top";
+            ctx.save();
             
             let tamanhoFonteFinal = caixa.tamanhoFonte;
             let linhasFinais = [];
@@ -1250,39 +1276,49 @@
                 tamanhoFonteFinal--; 
             }
 
-            for (let k = 0; k < linhasFinais.length; k++) {
-                ctx.fillText(linhasFinais[k].trim(), x, y + (k * alturaLinha));
+            let alturaTotal = Math.max(alturaLinha, linhasFinais.length * alturaLinha);
+            let centroX = x + (caixa.larguraCaixa / 2);
+            let centroY = y + (alturaTotal / 2);
+
+            // APLICA ROTAÇÃO SE EXISTIR
+            ctx.translate(centroX, centroY);
+            if (caixa.rotacao) {
+                ctx.rotate((caixa.rotacao * Math.PI) / 180);
             }
+
+            ctx.fillStyle = caixa.cor;
+            ctx.textBaseline = "top";
+            ctx.textAlign = "left";
+
+            let startX = -caixa.larguraCaixa / 2;
+            let startY = -alturaTotal / 2;
+
+            for (let k = 0; k < linhasFinais.length; k++) {
+                ctx.fillText(linhasFinais[k].trim(), startX, startY + (k * alturaLinha));
+            }
+
+            ctx.restore();
 
             return {
                 w: caixa.larguraCaixa,
-                h: Math.max(alturaLinha, linhasFinais.length * alturaLinha)
+                h: alturaTotal
             };
         }
 
-        window.renderizarFiltroAtual = function(mostrarGuias = true) {
-            const canvasLive = document.getElementById("canvasLivePreview");
-            if (!canvasLive || !canvasOriginalContextData) return;
-            const ctxLive = canvasLive.getContext("2d");
-            
+        // PROCESSA O FILTRO DA IMAGEM E SALVA NO CACHE
+        window.atualizarFiltrosComCache = function() {
+            if (!canvasFiltroCache || !canvasOriginalContextData) return;
+            const ctxCache = canvasFiltroCache.getContext("2d");
+
             const slB = document.getElementById("sliderBrilho");
             const slC = document.getElementById("sliderContraste");
             let valBrilho = slB ? parseInt(slB.value) : 0;
             let valContraste = slC ? parseInt(slC.value) : 0;
 
-            if (indiceCaixaTextoAtiva !== null && caixasTexto[indiceCaixaTextoAtiva]) {
-                const lblF = document.getElementById("lblTamanhoFonte");
-                const lblL = document.getElementById("lblLarguraCaixaTexto");
-                if (lblF) lblF.innerText = caixasTexto[indiceCaixaTextoAtiva].tamanhoFonte + "px";
-                if (lblL) lblL.innerText = caixasTexto[indiceCaixaTextoAtiva].larguraCaixa + "px";
-            }
+            ctxCache.putImageData(canvasOriginalContextData, 0, 0);
 
-            // 1. Imagem Base
-            ctxLive.putImageData(canvasOriginalContextData, 0, 0);
-            
-            // 2. Filtros de Imagem
             if (window.filtroAtivo !== 'original' || valBrilho !== 0 || valContraste !== 0) {
-                const imgData = ctxLive.getImageData(0, 0, larguraCrop, alturaCrop);
+                const imgData = ctxCache.getImageData(0, 0, larguraCrop, alturaCrop);
                 const data = imgData.data;
                 const fatorContraste = (259 * (valContraste + 255)) / (255 * (259 - valContraste));
 
@@ -1317,10 +1353,38 @@
                     data[i+1] = Math.min(255, Math.max(0, g));
                     data[i+2] = Math.min(255, Math.max(0, b));
                 }
-                ctxLive.putImageData(imgData, 0, 0);
+                ctxCache.putImageData(imgData, 0, 0);
+            }
+            window.solicitarRenderizacaoSuperficial();
+        };
+
+        // SOLICITA RENDERIZAÇÃO ULTRA-RÁPIDA VIA ANIMATION FRAME (SEM TRAVAMENTOS)
+        window.solicitarRenderizacaoSuperficial = function(mostrarGuias = true) {
+            if (!renderFramePendente) {
+                renderFramePendente = true;
+                requestAnimationFrame(() => {
+                    window.renderizarFiltroAtual(mostrarGuias);
+                    renderFramePendente = false;
+                });
+            }
+        };
+
+        window.renderizarFiltroAtual = function(mostrarGuias = true) {
+            const canvasLive = document.getElementById("canvasLivePreview");
+            if (!canvasLive || !canvasFiltroCache) return;
+            const ctxLive = canvasLive.getContext("2d");
+
+            if (indiceCaixaTextoAtiva !== null && caixasTexto[indiceCaixaTextoAtiva]) {
+                const lblF = document.getElementById("lblTamanhoFonte");
+                const lblL = document.getElementById("lblLarguraCaixaTexto");
+                if (lblF) lblF.innerText = caixasTexto[indiceCaixaTextoAtiva].tamanhoFonte + "px";
+                if (lblL) lblL.innerText = caixasTexto[indiceCaixaTextoAtiva].larguraCaixa + "px";
             }
 
-            // DESENHA CAMADAS CONFORME ORDEM DEFINIDA
+            // 1. COPIA A IMAGEM FILTRADA DO CACHE
+            ctxLive.drawImage(canvasFiltroCache, 0, 0);
+
+            // 2. DESENHA CAMADAS SOBREPOSTAS
             ordemCamadas.forEach(camada => {
                 if (camada === 'texto') {
                     caixasTexto.forEach((caixa, index) => {
@@ -1331,11 +1395,17 @@
 
                             if (mostrarGuias) {
                                 let eSelecionada = (index === indiceCaixaTextoAtiva);
+                                ctxLive.save();
+                                let cx = caixa.posicao.x + (caixa.larguraCaixa / 2);
+                                let cy = caixa.posicao.y + (caixa.dimensaoCalculada.h / 2);
+                                ctxLive.translate(cx, cy);
+                                if (caixa.rotacao) ctxLive.rotate((caixa.rotacao * Math.PI) / 180);
+
                                 ctxLive.strokeStyle = eSelecionada ? "rgba(59, 130, 246, 0.9)" : "rgba(156, 163, 175, 0.4)";
                                 ctxLive.lineWidth = eSelecionada ? 2 : 1;
                                 ctxLive.setLineDash([4, 4]);
-                                ctxLive.strokeRect(caixa.posicao.x - 4, caixa.posicao.y - 4, caixa.dimensaoCalculada.w + 8, caixa.dimensaoCalculada.h + 8);
-                                ctxLive.setLineDash([]);
+                                ctxLive.strokeRect(-caixa.larguraCaixa / 2 - 4, -caixa.dimensaoCalculada.h / 2 - 4, caixa.dimensaoCalculada.w + 8, caixa.dimensaoCalculada.h + 8);
+                                ctxLive.restore();
                             }
                         }
                     });
@@ -1418,7 +1488,7 @@
                             
                             elementoSendoArrastado = 'texto_' + i;
                             offsetArrasto = { x: pos.x - caixa.posicao.x, y: pos.y - caixa.posicao.y };
-                            window.renderizarFiltroAtual(true);
+                            window.solicitarRenderizacaoSuperficial();
                             return;
                         }
                     }
@@ -1443,7 +1513,7 @@
                     posicaoCarimbo.x = pos.x - offsetArrasto.x;
                     posicaoCarimbo.y = pos.y - offsetArrasto.y;
                 }
-                window.renderizarFiltroAtual(true);
+                window.solicitarRenderizacaoSuperficial();
             };
 
             const finalizarArrasto = () => { elementoSendoArrastado = null; };
@@ -1457,7 +1527,7 @@
             canvas.ontouchend = finalizarArrasto;
         }
 
-        // ASSINATURA HD COM CURVAS BÉZIER E RESULUÇÃO AJUSTADA
+        // ASSINATURA HD COM CURVAS BÉZIER
         window.abrirModalAssinatura = function() {
             const modal = document.getElementById("modalAssinatura");
             if (modal) { modal.classList.remove("hidden"); modal.classList.add("flex"); }
@@ -1546,7 +1616,7 @@
                 if (txtBtnAss) txtBtnAss.innerText = "Refazer Assinatura";
                 
                 window.fecharModalAssinatura();
-                window.renderizarFiltroAtual(true);
+                window.solicitarRenderizacaoSuperficial();
             };
             img.src = dataUrl;
         };
@@ -1559,7 +1629,7 @@
             const txtBtnAss = document.getElementById("txtBtnAssinatura");
             if (txtBtnAss) txtBtnAss.innerText = "Assinar";
             
-            window.renderizarFiltroAtual(true);
+            window.solicitarRenderizacaoSuperficial();
         };
 
         window.confirmarSalvarPaginaScanner = function() {
@@ -1679,8 +1749,12 @@
                 configurarEventosArrastoCanvas(canvasLive);
             }
 
+            canvasFiltroCache = document.createElement('canvas');
+            canvasFiltroCache.width = larguraCrop;
+            canvasFiltroCache.height = alturaCrop;
+
             sincronizarPainelComCaixaAtiva();
-            window.renderizarFiltroAtual(true);
+            window.atualizarFiltrosComCache();
         };
 
         window.removerPaginaScanner = function(index) {
