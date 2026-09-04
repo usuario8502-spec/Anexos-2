@@ -527,12 +527,21 @@
 
             <!-- CONTROLES DE ASSINATURA -->
             <div id="painelControleAssinatura" class="hidden px-4 mt-2">
-                <div class="bg-indigo-950/40 p-3 rounded-xl border border-indigo-800/60 flex flex-col gap-2">
-                    <span class="text-xs font-bold text-indigo-400 flex items-center gap-1.5"><i class="fas fa-pen-nib"></i> Ajustar Assinatura (Arraste no canvas)</span>
-                    <div class="flex items-center gap-3">
-                        <label class="text-[10px] text-gray-400 font-bold uppercase whitespace-nowrap">Tamanho/Escala:</label>
-                        <input type="range" id="sliderEscalaAssinatura" min="30" max="300" value="120" oninput="window.solicitarRenderizacaoSuperficial()">
-                        <button onclick="window.removerAssinaturaCanvas()" class="text-red-400 hover:text-red-300 text-xs p-1" title="Remover Assinatura"><i class="fas fa-trash-alt"></i></button>
+                <div class="bg-indigo-950/40 p-3 rounded-xl border border-indigo-800/60 flex flex-col gap-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-indigo-400 flex items-center gap-1.5"><i class="fas fa-pen-nib"></i> Ajustar Assinatura Selecionada</span>
+                        <button onclick="window.removerAssinaturaAtiva()" class="text-red-400 hover:text-red-300 text-xs p-1" title="Remover Assinatura Selecionada"><i class="fas fa-trash-alt"></i> Excluir</button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 items-center">
+                        <div class="flex items-center gap-2">
+                            <label class="text-[10px] text-gray-400 font-bold uppercase whitespace-nowrap">Tamanho:</label>
+                            <input type="range" id="sliderEscalaAssinatura" min="30" max="300" value="120" oninput="window.atualizarEscalaAssinaturaAtiva()">
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-[10px] text-gray-400 font-bold uppercase whitespace-nowrap"><i class="fas fa-sync-alt text-indigo-400"></i> Rotação:</label>
+                            <input type="range" id="sliderRotacaoAssinatura" min="0" max="360" value="0" oninput="window.atualizarRotacaoAssinaturaAtiva()">
+                            <span id="lblRotacaoAssinatura" class="text-xs font-bold text-white w-8">0°</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -560,7 +569,7 @@
                     <i class="fas fa-stamp"></i> <span id="txtBtnCarimbo">Carimbar</span>
                 </button>
                 <button onclick="window.abrirModalAssinatura()" class="bg-indigo-600 hover:bg-indigo-500 text-white py-3.5 rounded-xl font-bold text-xs sm:text-sm flex-1 flex items-center justify-center gap-2 transition shadow-lg">
-                    <i class="fas fa-signature"></i> <span id="txtBtnAssinatura">Assinar</span>
+                    <i class="fas fa-signature"></i> <span>Assinar</span>
                 </button>
                 <button onclick="window.confirmarSalvarPaginaScanner()" class="bg-blue-600 hover:bg-blue-500 text-white py-3.5 rounded-xl font-bold text-xs sm:text-sm flex-1 flex items-center justify-center gap-2 shadow-lg">
                     <i class="fas fa-check"></i> Salvar
@@ -587,7 +596,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL E FIREBASE COM PERFORMANCE ULTRA-SUAVE E ROTAÇÃO -->
+    <!-- SCRIPT PRINCIPAL E FIREBASE COM MÚLTIPLAS ASSINATURAS E ROTAÇÃO INDIVIDUAL -->
     <script type="module">
         import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, setPersistence, browserSessionPersistence, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -648,7 +657,7 @@
 
         let cropperInstancia = null;
         let canvasOriginalContextData = null; 
-        let canvasFiltroCache = null; // CACHE DE PERFORMANCE DA IMAGEM
+        let canvasFiltroCache = null; 
         let larguraCrop = 0;
         let alturaCrop = 0;
         window.filtroAtivo = 'pb'; 
@@ -657,8 +666,9 @@
         let caixasTexto = [];
         let indiceCaixaTextoAtiva = null;
 
-        let posicaoAssinatura = { x: 50, y: 150 };
-        let imgAssinaturaElemento = null;
+        // ESTRUTURA PARA MÚLTIPLAS ASSINATURAS COM ROTAÇÃO INDIVIDUAL
+        let listaAssinaturas = [];
+        let indiceAssinaturaAtiva = null;
 
         // VARIÁVEIS DO CARIMBO E ORDEM DE CAMADAS
         let imgCarimboElemento = null;
@@ -1045,19 +1055,16 @@
             }];
             indiceCaixaTextoAtiva = 0;
 
-            let larguraAssPadrao = larguraCrop * 0.65;
-            posicaoAssinatura = { x: (larguraCrop - larguraAssPadrao) / 2, y: (alturaCrop / 2) + 50 };
-            imgAssinaturaElemento = null;
+            listaAssinaturas = [];
+            indiceAssinaturaAtiva = null;
             imgCarimboElemento = null;
             
             const slB = document.getElementById("sliderBrilho"); if (slB) slB.value = 0;
             const slC = document.getElementById("sliderContraste"); if (slC) slC.value = 0;
-            const slAss = document.getElementById("sliderEscalaAssinatura"); if (slAss) slAss.value = 120;
             
             const pAss = document.getElementById("painelControleAssinatura"); if (pAss) { pAss.classList.add("hidden"); pAss.classList.remove("flex"); }
             const pCar = document.getElementById("painelControleCarimbo"); if (pCar) { pCar.classList.add("hidden"); pCar.classList.remove("flex"); }
             
-            const txtBtnAss = document.getElementById("txtBtnAssinatura"); if (txtBtnAss) txtBtnAss.innerText = "Assinar";
             const txtBtnCar = document.getElementById("txtBtnCarimbo"); if (txtBtnCar) txtBtnCar.innerText = "Carimbar";
 
             const slLarg = document.getElementById("sliderLarguraCaixaTexto");
@@ -1079,12 +1086,12 @@
                 configurarEventosArrastoCanvas(canvasLive);
             }
 
-            // CRIA CANVAS AUXILIAR PARA CACHE DE FILTROS (MELHORIA DRÁSTICA DE PERFORMANCE)
             canvasFiltroCache = document.createElement('canvas');
             canvasFiltroCache.width = larguraCrop;
             canvasFiltroCache.height = alturaCrop;
             
             sincronizarPainelComCaixaAtiva();
+            sincronizarPainelComAssinaturaAtiva();
             window.aplicarFiltroBase('pb'); 
         };
 
@@ -1231,6 +1238,49 @@
             }
         };
 
+        // GESTÃO DE PAINEL PARA ASSINATURAS MÚLTIPLAS
+        function sincronizarPainelComAssinaturaAtiva() {
+            const painelAss = document.getElementById("painelControleAssinatura");
+            if (indiceAssinaturaAtiva !== null && listaAssinaturas[indiceAssinaturaAtiva]) {
+                const ass = listaAssinaturas[indiceAssinaturaAtiva];
+                if (painelAss) { painelAss.classList.remove("hidden"); painelAss.classList.add("flex"); }
+                const slEsc = document.getElementById("sliderEscalaAssinatura"); if (slEsc) slEsc.value = ass.escala || 120;
+                const slRot = document.getElementById("sliderRotacaoAssinatura"); if (slRot) slRot.value = ass.rotacao || 0;
+                const lblRot = document.getElementById("lblRotacaoAssinatura"); if (lblRot) lblRot.innerText = (ass.rotacao || 0) + "°";
+            } else {
+                if (painelAss) { painelAss.classList.add("hidden"); painelAss.classList.remove("flex"); }
+            }
+        }
+
+        window.atualizarEscalaAssinaturaAtiva = function() {
+            if (indiceAssinaturaAtiva !== null && listaAssinaturas[indiceAssinaturaAtiva]) {
+                const sl = document.getElementById("sliderEscalaAssinatura");
+                if (sl) listaAssinaturas[indiceAssinaturaAtiva].escala = parseInt(sl.value);
+                window.solicitarRenderizacaoSuperficial();
+            }
+        };
+
+        window.atualizarRotacaoAssinaturaAtiva = function() {
+            if (indiceAssinaturaAtiva !== null && listaAssinaturas[indiceAssinaturaAtiva]) {
+                const sl = document.getElementById("sliderRotacaoAssinatura");
+                if (sl) {
+                    listaAssinaturas[indiceAssinaturaAtiva].rotacao = parseInt(sl.value);
+                    const lbl = document.getElementById("lblRotacaoAssinatura");
+                    if (lbl) lbl.innerText = sl.value + "°";
+                }
+                window.solicitarRenderizacaoSuperficial();
+            }
+        };
+
+        window.removerAssinaturaAtiva = function() {
+            if (indiceAssinaturaAtiva !== null && listaAssinaturas.length > 0) {
+                listaAssinaturas.splice(indiceAssinaturaAtiva, 1);
+                indiceAssinaturaAtiva = listaAssinaturas.length > 0 ? listaAssinaturas.length - 1 : null;
+                sincronizarPainelComAssinaturaAtiva();
+                window.solicitarRenderizacaoSuperficial();
+            }
+        };
+
         function desenharTextoEstiloDocumentoAutoAjustavel(ctx, caixa, x, y) {
             ctx.save();
             
@@ -1280,7 +1330,6 @@
             let centroX = x + (caixa.larguraCaixa / 2);
             let centroY = y + (alturaTotal / 2);
 
-            // APLICA ROTAÇÃO SE EXISTIR
             ctx.translate(centroX, centroY);
             if (caixa.rotacao) {
                 ctx.rotate((caixa.rotacao * Math.PI) / 180);
@@ -1358,7 +1407,7 @@
             window.solicitarRenderizacaoSuperficial();
         };
 
-        // SOLICITA RENDERIZAÇÃO ULTRA-RÁPIDA VIA ANIMATION FRAME (SEM TRAVAMENTOS)
+        // SOLICITA RENDERIZAÇÃO ULTRA-RÁPIDA VIA ANIMATION FRAME
         window.solicitarRenderizacaoSuperficial = function(mostrarGuias = true) {
             if (!renderFramePendente) {
                 renderFramePendente = true;
@@ -1409,12 +1458,35 @@
                             }
                         }
                     });
-                } else if (camada === 'assinatura' && imgAssinaturaElemento) {
-                    const slEsc = document.getElementById("sliderEscalaAssinatura");
-                    let escala = slEsc ? parseInt(slEsc.value) / 100 : 1.2;
-                    let larguraAss = (larguraCrop * 0.45) * escala;
-                    let alturaAss = (imgAssinaturaElemento.height * larguraAss) / imgAssinaturaElemento.width;
-                    ctxLive.drawImage(imgAssinaturaElemento, posicaoAssinatura.x, posicaoAssinatura.y, larguraAss, alturaAss);
+                } else if (camada === 'assinatura') {
+                    listaAssinaturas.forEach((ass, index) => {
+                        if (ass.img) {
+                            let escala = (ass.escala || 120) / 100;
+                            let larguraAss = (larguraCrop * 0.45) * escala;
+                            let alturaAss = (ass.img.height * larguraAss) / ass.img.width;
+
+                            ctxLive.save();
+                            let centroX = ass.posicao.x + (larguraAss / 2);
+                            let centroY = ass.posicao.y + (alturaAss / 2);
+                            ctxLive.translate(centroX, centroY);
+                            if (ass.rotacao) {
+                                ctxLive.rotate((ass.rotacao * Math.PI) / 180);
+                            }
+
+                            ctxLive.drawImage(ass.img, -larguraAss / 2, -alturaAss / 2, larguraAss, alturaAss);
+
+                            if (mostrarGuias) {
+                                let eSelecionada = (index === indiceAssinaturaAtiva);
+                                ctxLive.strokeStyle = eSelecionada ? "rgba(99, 102, 241, 0.9)" : "rgba(156, 163, 175, 0.4)";
+                                ctxLive.lineWidth = eSelecionada ? 2 : 1;
+                                ctxLive.setLineDash([4, 4]);
+                                ctxLive.strokeRect(-larguraAss / 2 - 4, -alturaAss / 2 - 4, larguraAss + 8, alturaAss + 8);
+                            }
+                            ctxLive.restore();
+
+                            ass.dimensaoCalculada = { w: larguraAss, h: alturaAss };
+                        }
+                    });
                 } else if (camada === 'carimbo' && imgCarimboElemento) {
                     const slCar = document.getElementById("sliderEscalaCarimbo");
                     let escalaC = slCar ? parseInt(slCar.value) / 100 : 0.85;
@@ -1463,17 +1535,21 @@
                     }
                 }
                 
-                if (imgAssinaturaElemento) {
-                    const slEsc = document.getElementById("sliderEscalaAssinatura");
-                    let escala = slEsc ? parseInt(slEsc.value) / 100 : 1.2;
-                    let larguraAss = (larguraCrop * 0.45) * escala;
-                    let alturaAss = (imgAssinaturaElemento.height * larguraAss) / imgAssinaturaElemento.width;
-                    
-                    if (pos.x >= posicaoAssinatura.x && pos.x <= posicaoAssinatura.x + larguraAss &&
-                        pos.y >= posicaoAssinatura.y && pos.y <= posicaoAssinatura.y + alturaAss) {
-                        elementoSendoArrastado = 'assinatura';
-                        offsetArrasto = { x: pos.x - posicaoAssinatura.x, y: pos.y - posicaoAssinatura.y };
-                        return;
+                // TESTA ARRASTO EM TODAS AS ASSINATURAS CADASTRADAS
+                for (let i = listaAssinaturas.length - 1; i >= 0; i--) {
+                    let ass = listaAssinaturas[i];
+                    if (ass.img && ass.dimensaoCalculada) {
+                        if (pos.x >= ass.posicao.x - 10 && pos.x <= ass.posicao.x + ass.dimensaoCalculada.w + 10 &&
+                            pos.y >= ass.posicao.y - 10 && pos.y <= ass.posicao.y + ass.dimensaoCalculada.h + 10) {
+                            
+                            indiceAssinaturaAtiva = i;
+                            sincronizarPainelComAssinaturaAtiva();
+                            
+                            elementoSendoArrastado = 'assinatura_' + i;
+                            offsetArrasto = { x: pos.x - ass.posicao.x, y: pos.y - ass.posicao.y };
+                            window.solicitarRenderizacaoSuperficial();
+                            return;
+                        }
                     }
                 }
 
@@ -1506,9 +1582,12 @@
                         caixasTexto[idx].posicao.x = pos.x - offsetArrasto.x;
                         caixasTexto[idx].posicao.y = pos.y - offsetArrasto.y;
                     }
-                } else if (elementoSendoArrastado === 'assinatura') {
-                    posicaoAssinatura.x = pos.x - offsetArrasto.x;
-                    posicaoAssinatura.y = pos.y - offsetArrasto.y;
+                } else if (elementoSendoArrastado.startsWith('assinatura_')) {
+                    let idx = parseInt(elementoSendoArrastado.split('_')[1]);
+                    if (listaAssinaturas[idx]) {
+                        listaAssinaturas[idx].posicao.x = pos.x - offsetArrasto.x;
+                        listaAssinaturas[idx].posicao.y = pos.y - offsetArrasto.y;
+                    }
                 } else if (elementoSendoArrastado === 'carimbo') {
                     posicaoCarimbo.x = pos.x - offsetArrasto.x;
                     posicaoCarimbo.y = pos.y - offsetArrasto.y;
@@ -1601,6 +1680,7 @@
             if (modal) { modal.classList.add("hidden"); modal.classList.remove("flex"); }
         };
 
+        // SALVA E ADICIONA COMO UMA NOVA ASSINATURA INDEPENDENTE
         window.salvarAssinaturaParaCanvas = function() {
             const canvasAss = document.getElementById("canvasAssinatura");
             if (!canvasAss) return;
@@ -1608,28 +1688,23 @@
             
             const img = new Image();
             img.onload = function() {
-                imgAssinaturaElemento = img;
-                const pAss = document.getElementById("painelControleAssinatura");
-                if (pAss) { pAss.classList.remove("hidden"); pAss.classList.add("flex"); }
+                let larguraAssPadrao = larguraCrop * 0.65;
+                const novaAss = {
+                    id: Date.now(),
+                    img: img,
+                    posicao: { x: (larguraCrop - larguraAssPadrao) / 2, y: 150 + (listaAssinaturas.length * 50) },
+                    escala: 120,
+                    rotacao: 0,
+                    dimensaoCalculada: { w: larguraAssPadrao, h: 100 }
+                };
+                listaAssinaturas.push(novaAss);
+                indiceAssinaturaAtiva = listaAssinaturas.length - 1;
                 
-                const txtBtnAss = document.getElementById("txtBtnAssinatura");
-                if (txtBtnAss) txtBtnAss.innerText = "Refazer Assinatura";
-                
+                sincronizarPainelComAssinaturaAtiva();
                 window.fecharModalAssinatura();
                 window.solicitarRenderizacaoSuperficial();
             };
             img.src = dataUrl;
-        };
-
-        window.removerAssinaturaCanvas = function() {
-            imgAssinaturaElemento = null;
-            const pAss = document.getElementById("painelControleAssinatura");
-            if (pAss) { pAss.classList.add("hidden"); pAss.classList.remove("flex"); }
-            
-            const txtBtnAss = document.getElementById("txtBtnAssinatura");
-            if (txtBtnAss) txtBtnAss.innerText = "Assinar";
-            
-            window.solicitarRenderizacaoSuperficial();
         };
 
         window.confirmarSalvarPaginaScanner = function() {
@@ -1644,12 +1719,17 @@
                 alturaCrop: alturaCrop,
                 caixasTexto: JSON.parse(JSON.stringify(caixasTexto)),
                 indiceCaixaTextoAtiva: indiceCaixaTextoAtiva,
-                posicaoAssinatura: { ...posicaoAssinatura },
-                imgAssinaturaElemento: imgAssinaturaElemento,
+                listaAssinaturas: listaAssinaturas.map(a => ({
+                    id: a.id,
+                    posicao: { ...a.posicao },
+                    escala: a.escala,
+                    rotacao: a.rotacao,
+                    dataUrlImg: a.img ? a.img.src : null
+                })),
+                indiceAssinaturaAtiva: indiceAssinaturaAtiva,
                 imgCarimboElemento: imgCarimboElemento,
                 posicaoCarimbo: { ...posicaoCarimbo },
                 escalaCarimbo: document.getElementById("sliderEscalaCarimbo") ? document.getElementById("sliderEscalaCarimbo").value : 85,
-                escalaAssinatura: document.getElementById("sliderEscalaAssinatura") ? document.getElementById("sliderEscalaAssinatura").value : 120,
                 brilho: document.getElementById("sliderBrilho") ? document.getElementById("sliderBrilho").value : 0,
                 contraste: document.getElementById("sliderContraste") ? document.getElementById("sliderContraste").value : 0,
                 finalDataUrl: imgSalvaDataUrl
@@ -1713,23 +1793,28 @@
             alturaCrop = pag.alturaCrop;
             caixasTexto = JSON.parse(JSON.stringify(pag.caixasTexto));
             indiceCaixaTextoAtiva = pag.indiceCaixaTextoAtiva;
-            posicaoAssinatura = { ...pag.posicaoAssinatura };
-            imgAssinaturaElemento = pag.imgAssinaturaElemento;
+            
+            // RECONSTRÓI LISTA DE ASSINATURAS REAPROVEITADAS
+            listaAssinaturas = (pag.listaAssinaturas || []).map(a => {
+                let imgInst = new Image();
+                if (a.dataUrlImg) imgInst.src = a.dataUrlImg;
+                return {
+                    id: a.id,
+                    img: imgInst,
+                    posicao: { ...a.posicao },
+                    escala: a.escala,
+                    rotacao: a.rotacao,
+                    dimensaoCalculada: { w: 200, h: 100 }
+                };
+            });
+            indiceAssinaturaAtiva = pag.indiceAssinaturaAtiva;
+
             imgCarimboElemento = pag.imgCarimboElemento;
             posicaoCarimbo = { ...pag.posicaoCarimbo };
 
-            const slEsc = document.getElementById("sliderEscalaAssinatura"); if (slEsc) slEsc.value = pag.escalaAssinatura || 120;
             const slCar = document.getElementById("sliderEscalaCarimbo"); if (slCar) slCar.value = pag.escalaCarimbo || 85;
             const slB = document.getElementById("sliderBrilho"); if (slB) slB.value = pag.brilho;
             const slC = document.getElementById("sliderContraste"); if (slC) slC.value = pag.contraste;
-
-            if (imgAssinaturaElemento) {
-                const pAss = document.getElementById("painelControleAssinatura"); if (pAss) { pAss.classList.remove("hidden"); pAss.classList.add("flex"); }
-                const txtBtn = document.getElementById("txtBtnAssinatura"); if (txtBtn) txtBtn.innerText = "Refazer Assinatura";
-            } else {
-                const pAss = document.getElementById("painelControleAssinatura"); if (pAss) { pAss.classList.add("hidden"); pAss.classList.remove("flex"); }
-                const txtBtn = document.getElementById("txtBtnAssinatura"); if (txtBtn) txtBtn.innerText = "Assinar";
-            }
 
             if (imgCarimboElemento) {
                 const pCar = document.getElementById("painelControleCarimbo"); if (pCar) { pCar.classList.remove("hidden"); pCar.classList.add("flex"); }
@@ -1754,6 +1839,7 @@
             canvasFiltroCache.height = alturaCrop;
 
             sincronizarPainelComCaixaAtiva();
+            sincronizarPainelComAssinaturaAtiva();
             window.atualizarFiltrosComCache();
         };
 
