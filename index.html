@@ -546,7 +546,7 @@
                 </div>
             </div>
 
-            <!-- CONTROLES DO CARIMBO DA EMPRESA COM ORDEM DE CAMADAS -->
+            <!-- CONTROLES DO CARIMBO DA EMPRESA COM ORDEM DE CAMADAS E ROTAÇÃO -->
             <div id="painelControleCarimbo" class="hidden px-4 mt-2">
                 <div class="bg-red-950/40 p-3 rounded-xl border border-red-800/60 flex flex-col gap-2">
                     <div class="flex justify-between items-center">
@@ -556,10 +556,19 @@
                             <button onclick="window.alterarOrdemCarimbo('frente')" class="bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 text-[10px] font-bold px-2 py-1 rounded shadow" title="Trazer para Frente"><i class="fas fa-layer-group text-green-400"></i> Para Frente</button>
                         </div>
                     </div>
-                    <div class="flex items-center gap-3 mt-1">
-                        <label class="text-[10px] text-gray-400 font-bold uppercase whitespace-nowrap">Tamanho/Escala:</label>
-                        <input type="range" id="sliderEscalaCarimbo" min="20" max="250" value="85" oninput="window.solicitarRenderizacaoSuperficial()">
-                        <button onclick="window.removerCarimboCanvas()" class="text-red-400 hover:text-red-300 text-xs p-1" title="Remover Carimbo"><i class="fas fa-trash-alt"></i></button>
+                    <div class="grid grid-cols-2 gap-3 items-center mt-1">
+                        <div class="flex items-center gap-2">
+                            <label class="text-[10px] text-gray-400 font-bold uppercase whitespace-nowrap">Tamanho:</label>
+                            <input type="range" id="sliderEscalaCarimbo" min="20" max="250" value="85" oninput="window.solicitarRenderizacaoSuperficial()">
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-[10px] text-gray-400 font-bold uppercase whitespace-nowrap"><i class="fas fa-sync-alt text-red-400"></i> Rotação:</label>
+                            <input type="range" id="sliderRotacaoCarimbo" min="0" max="360" value="0" oninput="window.atualizarRotacaoCarimbo()">
+                            <span id="lblRotacaoCarimbo" class="text-xs font-bold text-white w-8">0°</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-end mt-1">
+                        <button onclick="window.removerCarimboCanvas()" class="text-red-400 hover:text-red-300 text-xs p-1" title="Remover Carimbo"><i class="fas fa-trash-alt"></i> Excluir Carimbo</button>
                     </div>
                 </div>
             </div>
@@ -596,7 +605,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL E FIREBASE COM MÚLTIPLAS ASSINATURAS E ROTAÇÃO INDIVIDUAL -->
+    <!-- SCRIPT PRINCIPAL E FIREBASE COM SUPORTE A ROTAÇÃO NO CARIMBO -->
     <script type="module">
         import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, setPersistence, browserSessionPersistence, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -673,6 +682,7 @@
         // VARIÁVEIS DO CARIMBO E ORDEM DE CAMADAS
         let imgCarimboElemento = null;
         let posicaoCarimbo = { x: 50, y: 50 };
+        let rotacaoCarimbo = 0;
         let ordemCamadas = ['imagem', 'texto', 'assinatura', 'carimbo'];
 
         let elementoSendoArrastado = null;
@@ -695,6 +705,16 @@
                 ordemCamadas.unshift('carimbo');
             } else {
                 ordemCamadas.push('carimbo');
+            }
+            window.solicitarRenderizacaoSuperficial();
+        };
+
+        window.atualizarRotacaoCarimbo = function() {
+            const el = document.getElementById("sliderRotacaoCarimbo");
+            if (el) {
+                rotacaoCarimbo = parseInt(el.value);
+                const lbl = document.getElementById("lblRotacaoCarimbo");
+                if (lbl) lbl.innerText = el.value + "°";
             }
             window.solicitarRenderizacaoSuperficial();
         };
@@ -739,6 +759,10 @@
             imgCarimboElemento = criarImagemCarimboVetor();
             imgCarimboElemento.onload = function() {
                 posicaoCarimbo = { x: (larguraCrop - 380) / 2, y: (alturaCrop / 2) - 80 };
+                rotacaoCarimbo = 0;
+                const slRot = document.getElementById("sliderRotacaoCarimbo"); if (slRot) slRot.value = 0;
+                const lblRot = document.getElementById("lblRotacaoCarimbo"); if (lblRot) lblRot.innerText = "0°";
+                
                 const pCar = document.getElementById("painelControleCarimbo");
                 if (pCar) { pCar.classList.remove("hidden"); pCar.classList.add("flex"); }
                 const txtB = document.getElementById("txtBtnCarimbo");
@@ -749,6 +773,7 @@
 
         window.removerCarimboCanvas = function() {
             imgCarimboElemento = null;
+            rotacaoCarimbo = 0;
             const pCar = document.getElementById("painelControleCarimbo");
             if (pCar) { pCar.classList.add("hidden"); pCar.classList.remove("flex"); }
             const txtB = document.getElementById("txtBtnCarimbo");
@@ -1058,6 +1083,7 @@
             listaAssinaturas = [];
             indiceAssinaturaAtiva = null;
             imgCarimboElemento = null;
+            rotacaoCarimbo = 0;
             
             const slB = document.getElementById("sliderBrilho"); if (slB) slB.value = 0;
             const slC = document.getElementById("sliderContraste"); if (slC) slC.value = 0;
@@ -1492,15 +1518,24 @@
                     let escalaC = slCar ? parseInt(slCar.value) / 100 : 0.85;
                     let larguraCar = 380 * escalaC;
                     let alturaCar = (imgCarimboElemento.height * larguraCar) / imgCarimboElemento.width;
-                    ctxLive.drawImage(imgCarimboElemento, posicaoCarimbo.x, posicaoCarimbo.y, larguraCar, alturaCar);
+
+                    ctxLive.save();
+                    let centroX = posicaoCarimbo.x + (larguraCar / 2);
+                    let centroY = posicaoCarimbo.y + (alturaCar / 2);
+                    ctxLive.translate(centroX, centroY);
+                    if (rotacaoCarimbo) {
+                        ctxLive.rotate((rotacaoCarimbo * Math.PI) / 180);
+                    }
+
+                    ctxLive.drawImage(imgCarimboElemento, -larguraCar / 2, -alturaCar / 2, larguraCar, alturaCar);
 
                     if (mostrarGuias) {
                         ctxLive.strokeStyle = "rgba(220, 38, 38, 0.8)";
                         ctxLive.lineWidth = 2;
                         ctxLive.setLineDash([4, 4]);
-                        ctxLive.strokeRect(posicaoCarimbo.x - 4, posicaoCarimbo.y - 4, larguraCar + 8, alturaCar + 8);
-                        ctxLive.setLineDash([]);
+                        ctxLive.strokeRect(-larguraCar / 2 - 4, -alturaCar / 2 - 4, larguraCar + 8, alturaCar + 8);
                     }
+                    ctxLive.restore();
                 }
             });
         };
@@ -1729,6 +1764,7 @@
                 indiceAssinaturaAtiva: indiceAssinaturaAtiva,
                 imgCarimboElemento: imgCarimboElemento,
                 posicaoCarimbo: { ...posicaoCarimbo },
+                rotacaoCarimbo: rotacaoCarimbo,
                 escalaCarimbo: document.getElementById("sliderEscalaCarimbo") ? document.getElementById("sliderEscalaCarimbo").value : 85,
                 brilho: document.getElementById("sliderBrilho") ? document.getElementById("sliderBrilho").value : 0,
                 contraste: document.getElementById("sliderContraste") ? document.getElementById("sliderContraste").value : 0,
@@ -1811,8 +1847,13 @@
 
             imgCarimboElemento = pag.imgCarimboElemento;
             posicaoCarimbo = { ...pag.posicaoCarimbo };
+            rotacaoCarimbo = pag.rotacaoCarimbo || 0;
 
+            const slEsc = document.getElementById("sliderEscalaAssinatura"); if (slEsc) slEsc.value = pag.escalaAssinatura || 120;
             const slCar = document.getElementById("sliderEscalaCarimbo"); if (slCar) slCar.value = pag.escalaCarimbo || 85;
+            const slRotCar = document.getElementById("sliderRotacaoCarimbo"); if (slRotCar) slRotCar.value = rotacaoCarimbo;
+            const lblRotCar = document.getElementById("lblRotacaoCarimbo"); if (lblRotCar) lblRotCar.innerText = rotacaoCarimbo + "°";
+
             const slB = document.getElementById("sliderBrilho"); if (slB) slB.value = pag.brilho;
             const slC = document.getElementById("sliderContraste"); if (slC) slC.value = pag.contraste;
 
